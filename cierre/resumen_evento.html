@@ -38,10 +38,67 @@
   .carta p { margin: 10px 0; text-align: justify; }
   .carta .firma { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 12px; text-align: center; }
   .carta .firma div { border-top: 1px solid #1b3a2b; padding-top: 4px; }
+
+  /* ═══ BLOQUE GASOIL ═══ */
+  .gasoil-bloque { border: 2px solid #8a6d1d; background: #fffbf0; }
+  .gasoil-bloque .banco-titulo { color: #8a6d1d; }
+  .thumb-link {
+    display: inline-block;
+    width: 32px; height: 32px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #1b3a2b;
+    border-radius: 3px;
+    cursor: pointer;
+    vertical-align: middle;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .thumb-link:hover { border-color: #16a34a; }
+
+  /* ═══ BALANCE FINAL ═══ */
+  .balance-final {
+    background: #1b3a2b;
+    color: #fff;
+    padding: 20px 24px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+  .balance-final h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin: 0 0 14px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,.3);
+  }
+  .balance-final table { background: transparent; color: #fff; margin-bottom: 0; }
+  .balance-final th {
+    background: transparent;
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,.3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+  }
+  .balance-final td {
+    border-bottom: 1px solid rgba(255,255,255,.15);
+    color: #fff;
+  }
+  .balance-final tr.total-row td {
+    font-weight: bold;
+    font-size: 13px;
+    border-top: 2px solid rgba(255,255,255,.5);
+    border-bottom: none;
+    padding-top: 10px;
+  }
+  .balance-final td.num { font-variant-numeric: tabular-nums; }
+
   @media print {
     body { padding: 8px; font-size: 11px; background:#fff; }
     .btn { display: none; }
     .detalle { display: block !important; }
+    .gasoil-bloque, .balance-final { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
@@ -164,6 +221,56 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════
+       NUEVO BLOQUE: GASTOS OPERATIVOS — GASOIL
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="banco-bloque gasoil-bloque">
+    <div class="banco-titulo">Gastos operativos — Gasoil</div>
+    <div class="banco-desc">Aporte de combustible y personal operativo · 3 transferencias · Absorbido 100% por el productor</div>
+    <div class="kpis">
+      <div class="kpi"><div class="label">Total USD</div><div class="valor" id="gs_usd">—</div></div>
+      <div class="kpi"><div class="label">Bs pagados</div><div class="valor" id="gs_bs">—</div></div>
+      <div class="kpi"><div class="label">Equivalente EUR</div><div class="valor" id="gs_eur">—</div></div>
+      <div class="kpi"><div class="label">Tasa sistema</div><div class="valor">974</div></div>
+    </div>
+    <button class="btn" onclick="toggle('gs_detalle')">Ver detalle y evidencias</button>
+    <div id="gs_detalle" class="detalle">
+      <table>
+        <thead><tr>
+          <th>Fecha</th>
+          <th class="num">Monto Bs</th>
+          <th class="num">Tasa $ BCV</th>
+          <th class="num">Equiv. USD</th>
+          <th class="num">Equiv. €</th>
+          <th>Referencia</th>
+          <th style="text-align:center;">Recibo</th>
+          <th style="text-align:center;">Cálculo</th>
+          <th style="text-align:center;">Tasa</th>
+        </tr></thead>
+        <tbody id="gs_tabla_body"></tbody>
+        <tfoot id="gs_tabla_foot"></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       NUEVO BLOQUE: BALANCE FINAL NETO
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="balance-final">
+    <h3>💰 Balance final neto del contrato</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Parte</th>
+          <th class="num">Bruto €</th>
+          <th class="num">Gasoil €</th>
+          <th class="num">Neto €</th>
+        </tr>
+      </thead>
+      <tbody id="balance_body"></tbody>
+    </table>
+  </div>
+
   <div class="banco-bloque">
     <div class="banco-titulo">Cuadre de brazaletes</div>
     <table>
@@ -187,10 +294,10 @@
     </table>
   </div>
 
- <button class="btn" onclick="toggle('bloque_carta')" style="font-size:14px; padding:12px 20px;">📄 Cierre en acuerdo</button>
-<div id="bloque_carta" class="detalle">
-  <div id="carta_render"></div>
-</div>
+  <button class="btn" onclick="toggle('bloque_carta')" style="font-size:14px; padding:12px 20px;">📄 Cierre en acuerdo</button>
+  <div id="bloque_carta" class="detalle">
+    <div id="carta_render"></div>
+  </div>
 
   <button class="btn" onclick="window.print()" style="margin-top:16px;">Imprimir / Guardar PDF</button>
 </div>
@@ -245,7 +352,6 @@ async function cargar(tabla, prefijo) {
   return { pagos: totPagos, entradas: totEntradas, bs: totBs, cop: totCop, prod: totProd };
 }
 
-// ============ NUEVA FUNCIÓN: cargar preventa con regla acordada ============
 async function cargarPreventa() {
   const [prev, tasas] = await Promise.all([
     fetch(URL + "/rest/v1/preventa?select=*&order=marca_temporal.asc",
@@ -331,7 +437,56 @@ async function cargarPreventa() {
 
   return { pagos: comp, entradas: ent, bs: totBs, cop: totCop, prod: totProd, eur: totEur, eurCop: totEurCop, eurProd: totEurProd };
 }
-// ============ FIN NUEVA FUNCIÓN ============
+
+// ══════════════════════════════════════════════════════════════
+// NUEVA FUNCIÓN: cargarGasoil
+// ══════════════════════════════════════════════════════════════
+async function cargarGasoil() {
+  const r = await fetch(URL + "/rest/v1/gastos_gasoil?select=*&order=fecha.asc",
+    { headers: { apikey: KEY, Authorization: "Bearer " + KEY } });
+  const pagos = await r.json();
+
+  const totBs = pagos.reduce((s, p) => s + Number(p.monto_bs || 0), 0);
+  const totUsd = pagos.reduce((s, p) => s + Number(p.monto_usd || 0), 0);
+  const totEur = totBs / TASA;
+
+  document.getElementById("gs_usd").textContent = "$" + fmtBs(totUsd);
+  document.getElementById("gs_bs").textContent = fmtBs(totBs);
+  document.getElementById("gs_eur").textContent = fmtEur(totEur) + " €";
+
+  const tbody = document.getElementById("gs_tabla_body");
+  tbody.innerHTML = "";
+  pagos.forEach(p => {
+    const eur = Number(p.monto_bs || 0) / TASA;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.fecha}</td>
+      <td class="num">${fmtBs(Number(p.monto_bs))}</td>
+      <td class="num">${Number(p.tasa_bcv_dolar).toFixed(2)}</td>
+      <td class="num">$${Number(p.monto_usd).toFixed(2)}</td>
+      <td class="num">${fmtEur(eur)} €</td>
+      <td>${p.referencia || ''}</td>
+      <td style="text-align:center;"><a href="${p.captura_recibo_url || '#'}" target="_blank"><span class="thumb-link" style="background-image:url('${p.captura_recibo_url || ''}');"></span></a></td>
+      <td style="text-align:center;"><a href="${p.captura_calculo_url || '#'}" target="_blank"><span class="thumb-link" style="background-image:url('${p.captura_calculo_url || ''}');"></span></a></td>
+      <td style="text-align:center;"><a href="${p.captura_tasa_url || '#'}" target="_blank"><span class="thumb-link" style="background-image:url('${p.captura_tasa_url || ''}');"></span></a></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("gs_tabla_foot").innerHTML = `
+    <tr style="font-weight:bold; border-top:2px solid #1b3a2b;">
+      <td>TOTAL</td>
+      <td class="num">${fmtBs(totBs)}</td>
+      <td class="num">—</td>
+      <td class="num">$${totUsd.toFixed(2)}</td>
+      <td class="num">${fmtEur(totEur)} €</td>
+      <td colspan="4"></td>
+    </tr>
+  `;
+
+  return { bs: totBs, usd: totUsd, eur: totEur };
+}
+// ══════════════════════════════════════════════════════════════
 
 function pintarCartaA() {
   document.getElementById("carta_render").innerHTML = `
@@ -388,6 +543,7 @@ async function cargarTodo() {
     const mrc = await cargar("ventas_mercantil", "mrc");
     const act = await cargar("ventas_activo", "act");
     const prv = await cargarPreventa();
+    const gs  = await cargarGasoil();
 
     const pagos    = bdv.pagos + mrc.pagos + act.pagos + prv.pagos;
     const entradas = bdv.entradas + mrc.entradas + act.entradas + prv.entradas;
@@ -409,6 +565,29 @@ async function cargarTodo() {
     document.getElementById("tot_prod").textContent = fmtBs(prod);
     document.getElementById("tot_cope").textContent = fmtEur(eurCop) + " €";
     document.getElementById("tot_prode").textContent = fmtEur(eurProd) + " €";
+
+    // ═══ BALANCE FINAL NETO (con gasoil restado al productor) ═══
+    const prodNeto = eurProd - gs.eur;
+    document.getElementById("balance_body").innerHTML = `
+      <tr>
+        <td>Co-producción</td>
+        <td class="num">${fmtEur(eurCop)} €</td>
+        <td class="num">— €</td>
+        <td class="num">${fmtEur(eurCop)} €</td>
+      </tr>
+      <tr>
+        <td>Producción</td>
+        <td class="num">${fmtEur(eurProd)} €</td>
+        <td class="num">−${fmtEur(gs.eur)} €</td>
+        <td class="num">${fmtEur(prodNeto)} €</td>
+      </tr>
+      <tr class="total-row">
+        <td>TOTAL</td>
+        <td class="num">${fmtEur(eur)} €</td>
+        <td class="num">−${fmtEur(gs.eur)} €</td>
+        <td class="num">${fmtEur(eurCop + prodNeto)} €</td>
+      </tr>
+    `;
 
     const cfg = await fetch(URL + "/rest/v1/config_evento?select=*&id=eq.1",
       { headers: { apikey: KEY, Authorization: "Bearer " + KEY } }).then(r => r.json());
