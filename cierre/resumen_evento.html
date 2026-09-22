@@ -126,10 +126,34 @@
     </div>
   </div>
 
-  <div class="banco-bloque" style="background:#eef3f0;">
-    <div class="banco-titulo">Total general (los tres bancos)</div>
+  <!-- ============ BLOQUE PREVENTA (NUEVO) ============ -->
+  <div class="banco-bloque">
+    <div class="banco-titulo">Preventa (dentro del convenio)</div>
+    <div class="banco-desc">Compradores desde 03/06/2026 · Excluye duplicados y revocados · Tasa BCV euro del día de cada pago</div>
     <div class="kpis">
-      <div class="kpi"><div class="label">Pagos</div><div class="valor" id="tot_pagos">—</div></div>
+      <div class="kpi"><div class="label">Compradores</div><div class="valor" id="prv_pagos">—</div></div>
+      <div class="kpi"><div class="label">Entradas</div><div class="valor" id="prv_entradas">—</div></div>
+      <div class="kpi"><div class="label">Bs recibidos</div><div class="valor" id="prv_bs">—</div></div>
+      <div class="kpi"><div class="label">€ equivalentes</div><div class="valor" id="prv_eur">—</div></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="label">Bs Co-productor</div><div class="valor" id="prv_cop">—</div></div>
+      <div class="kpi"><div class="label">Bs Productor</div><div class="valor" id="prv_prod">—</div></div>
+      <div class="kpi"><div class="label">€ Co-productor</div><div class="valor" id="prv_cope">—</div></div>
+      <div class="kpi"><div class="label">€ Productor</div><div class="valor" id="prv_prode">—</div></div>
+    </div>
+    <button class="btn" onclick="toggle('prv_detalle')">Ver detalle</button>
+    <div id="prv_detalle" class="detalle">
+      <table><thead><tr><th>Fecha</th><th>Cliente</th><th>Categoría</th><th class="num">Bs pagados</th><th class="num">Tasa</th><th class="num">Bs Co-prod</th><th class="num">Bs Prod</th><th class="num">€ Co-prod</th><th class="num">€ Prod</th><th>Nota</th></tr></thead>
+      <tbody id="prv_tabla_detalle_body"></tbody></table>
+    </div>
+  </div>
+  <!-- ============ FIN BLOQUE PREVENTA ============ -->
+
+  <div class="banco-bloque" style="background:#eef3f0;">
+    <div class="banco-titulo">Total general (3 bancos + preventa)</div>
+    <div class="kpis">
+      <div class="kpi"><div class="label">Pagos / Compradores</div><div class="valor" id="tot_pagos">—</div></div>
       <div class="kpi"><div class="label">Entradas</div><div class="valor" id="tot_entradas">—</div></div>
       <div class="kpi"><div class="label">Bs recibidos</div><div class="valor" id="tot_bs">—</div></div>
       <div class="kpi"><div class="label">€ equivalentes</div><div class="valor" id="tot_eur">—</div></div>
@@ -177,6 +201,7 @@
 const URL = "https://shnatpwnwezmbhdvshfi.supabase.co";
 const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobmF0cHdud2V6bWJoZHZzaGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzgyNTgsImV4cCI6MjEwNTUxNDI1OH0.2fwqzX6zdr3m0qWCD_brKtdFVeWfcs4FsmAvSBLibN4";
 const TASA = 974;
+const FECHA_CONVENIO = "2026-06-03";
 
 const fmtBs = n => n.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const fmtEur = n => n.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -220,6 +245,93 @@ async function cargar(tabla, prefijo) {
   document.getElementById(prefijo + "_prode").textContent = fmtEur(totProd / TASA) + " €";
   return { pagos: totPagos, entradas: totEntradas, bs: totBs, cop: totCop, prod: totProd };
 }
+
+// ============ NUEVA FUNCIÓN: cargar preventa ============
+async function cargarPreventa() {
+  const [prev, tasas] = await Promise.all([
+    fetch(URL + "/rest/v1/preventa?select=*&order=marca_temporal.asc",
+      { headers: { apikey: KEY, Authorization: "Bearer " + KEY } }).then(r => r.json()),
+    fetch(URL + "/rest/v1/tasas_bcv?select=fecha,tasa_eur",
+      { headers: { apikey: KEY, Authorization: "Bearer " + KEY } }).then(r => r.json())
+  ]);
+
+  const tasasMap = {};
+  tasas.forEach(t => tasasMap[t.fecha] = Number(t.tasa_eur));
+
+  let comp=0, ent=0, totBs=0, totCop=0, totProd=0, totEurCop=0, totEurProd=0, totEur=0;
+  const tbodyDet = document.getElementById("prv_tabla_detalle_body");
+  tbodyDet.innerHTML = "";
+
+  prev.forEach(r => {
+    if (r.flag_revisar === "duplicado" || r.flag_revisar === "revocado") return;
+    const fechaStr = (r.marca_temporal || "").substring(0, 10);
+    if (fechaStr < FECHA_CONVENIO) return;
+
+    const monto = Number(r.monto_bs || 0);
+    const tasa = tasasMap[fechaStr] || TASA;
+    const valTeo = Number(r.valor_teorico_eur || 0);
+    const nVip = Number(r.entradas_vip || 0);
+    const nLeg = Number(r.entradas_legendario || 0);
+    const nPaq = nVip + nLeg;
+
+    let cop, prod, nota = "";
+
+    // REGLA 3 primero: paquetes VIP/Leg, sin importar el flag
+    if (nPaq > 0) {
+      cop = nPaq * 2.5 * tasa;
+      prod = monto - cop;
+      nota = nPaq + " paquete(s) VIP/Leg · 2,5€ c/u al BCV (" + tasa.toFixed(2) + ") · resto al productor";
+    }
+    // REGLA 2: pago en dólares
+    else if (r.flag_revisar === "pago_dolares") {
+      cop = (valTeo / 2) * tasa;
+      prod = monto - cop;
+      nota = "Pagó USD · 50% del valor teórico (" + valTeo + "€) al BCV";
+    }
+    // REGLA 4: excedente sin paquete → como Regla 2
+    else if (r.flag_revisar === "pago_excedente") {
+      cop = (valTeo / 2) * tasa;
+      prod = monto - cop;
+      nota = "Excedente · valor teórico (" + valTeo + "€) al BCV, 50/50";
+    }
+    // REGLA 1: normal
+    else {
+      cop = monto / 2; prod = monto / 2;
+      nota = "Pago normal 50/50 en Bs";
+    }
+
+    comp++;
+    ent += Number(r.entradas_total || 0);
+    totBs += monto; totCop += cop; totProd += prod;
+    totEurCop += cop / tasa;
+    totEurProd += prod / tasa;
+    totEur += monto / tasa;
+
+    const cat = (Number(r.entradas_estelar||0)>0 ? "Estelar " : "") +
+                (Number(r.entradas_meteoro||0)>0 ? "Meteoro " : "") +
+                (nVip>0 ? "VIP×" + nVip + " " : "") +
+                (nLeg>0 ? "Leg×" + nLeg : "");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${fechaStr}</td><td>${r.nombre || ""}</td><td>${cat.trim()}</td>
+      <td class="num">${fmtBs(monto)}</td><td class="num">${tasa.toFixed(2)}</td>
+      <td class="num">${fmtBs(cop)}</td><td class="num">${fmtBs(prod)}</td>
+      <td class="num">${fmtEur(cop/tasa)} €</td><td class="num">${fmtEur(prod/tasa)} €</td>
+      <td class="nota">${nota}</td>`;
+    tbodyDet.appendChild(tr);
+  });
+
+  document.getElementById("prv_pagos").textContent = comp;
+  document.getElementById("prv_entradas").textContent = ent;
+  document.getElementById("prv_bs").textContent = fmtBs(totBs);
+  document.getElementById("prv_eur").textContent = fmtEur(totEur) + " €";
+  document.getElementById("prv_cop").textContent = fmtBs(totCop);
+  document.getElementById("prv_prod").textContent = fmtBs(totProd);
+  document.getElementById("prv_cope").textContent = fmtEur(totEurCop) + " €";
+  document.getElementById("prv_prode").textContent = fmtEur(totEurProd) + " €";
+
+  return { pagos: comp, entradas: ent, bs: totBs, cop: totCop, prod: totProd, eur: totEur, eurCop: totEurCop, eurProd: totEurProd };
+}
+// ============ FIN NUEVA FUNCIÓN ============
 
 function pintarCartaA() {
   document.getElementById("carta_render").innerHTML = `
@@ -269,19 +381,29 @@ async function cargarTodo() {
     const bdv = await cargar("ventas_evento", "bdv");
     const mrc = await cargar("ventas_mercantil", "mrc");
     const act = await cargar("ventas_activo", "act");
-    const pagos = bdv.pagos + mrc.pagos + act.pagos;
-    const entradas = bdv.entradas + mrc.entradas + act.entradas;
-    const bs = bdv.bs + mrc.bs + act.bs;
-    const cop = bdv.cop + mrc.cop + act.cop;
-    const prod = bdv.prod + mrc.prod + act.prod;
+    const prv = await cargarPreventa();
+
+    const pagos    = bdv.pagos + mrc.pagos + act.pagos + prv.pagos;
+    const entradas = bdv.entradas + mrc.entradas + act.entradas + prv.entradas;
+    const bs       = bdv.bs + mrc.bs + act.bs + prv.bs;
+    const cop      = bdv.cop + mrc.cop + act.cop + prv.cop;
+    const prod     = bdv.prod + mrc.prod + act.prod + prv.prod;
+
+    // € del evento a tasa fija 974; € de preventa con su propia tasa por fila
+    const eurCopEvento  = (bdv.cop + mrc.cop + act.cop) / TASA;
+    const eurProdEvento = (bdv.prod + mrc.prod + act.prod) / TASA;
+    const eurCop = eurCopEvento + prv.eurCop;
+    const eurProd = eurProdEvento + prv.eurProd;
+    const eur = eurCop + eurProd;
+
     document.getElementById("tot_pagos").textContent = pagos;
     document.getElementById("tot_entradas").textContent = entradas;
     document.getElementById("tot_bs").textContent = fmtBs(bs);
-    document.getElementById("tot_eur").textContent = fmtEur(bs / TASA) + " €";
+    document.getElementById("tot_eur").textContent = fmtEur(eur) + " €";
     document.getElementById("tot_cop").textContent = fmtBs(cop);
     document.getElementById("tot_prod").textContent = fmtBs(prod);
-    document.getElementById("tot_cope").textContent = fmtEur(cop / TASA) + " €";
-    document.getElementById("tot_prode").textContent = fmtEur(prod / TASA) + " €";
+    document.getElementById("tot_cope").textContent = fmtEur(eurCop) + " €";
+    document.getElementById("tot_prode").textContent = fmtEur(eurProd) + " €";
 
     const cfg = await fetch(URL + "/rest/v1/config_evento?select=*&id=eq.1",
       { headers: { apikey: KEY, Authorization: "Bearer " + KEY } }).then(r => r.json());
