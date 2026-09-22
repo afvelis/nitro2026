@@ -58,11 +58,11 @@
 <div id="contenido">
   <button class="btn btn-salir" onclick="salir()">Cerrar sesión</button>
   <h1>Resumen Ventas Evento — Nitrotoon</h1>
-  <div class="sub">19 y 20 de septiembre de 2026 · Tasa fija 974 Bs/€ · Reparto 50/50 sobre boletería dentro del convenio (desde 03/06/2026)</div>
+  <div class="sub">19 y 20 de septiembre de 2026 · Reparto 50/50 sobre boletería dentro del convenio (desde 03/06/2026) · Paquetes VIP/Legendario cuentan como 1 entrada de 5€</div>
 
   <div class="banco-bloque">
     <div class="banco-titulo">Banco de Venezuela</div>
-    <div class="banco-desc">Ventas en taquilla · 19 y 20 de septiembre</div>
+    <div class="banco-desc">Ventas en taquilla · 19 y 20 de septiembre · Tasa fija 974 Bs/€</div>
     <div class="kpis">
       <div class="kpi"><div class="label">Pagos</div><div class="valor" id="bdv_pagos">—</div></div>
       <div class="kpi"><div class="label">Entradas</div><div class="valor" id="bdv_entradas">—</div></div>
@@ -84,7 +84,7 @@
 
   <div class="banco-bloque">
     <div class="banco-titulo">Banco Mercantil</div>
-    <div class="banco-desc">Ventas por oficina en atención a reclamos · 21 de septiembre</div>
+    <div class="banco-desc">Ventas por oficina en atención a reclamos · 21 de septiembre · Tasa fija 974 Bs/€</div>
     <div class="kpis">
       <div class="kpi"><div class="label">Pagos</div><div class="valor" id="mrc_pagos">—</div></div>
       <div class="kpi"><div class="label">Entradas</div><div class="valor" id="mrc_entradas">—</div></div>
@@ -106,7 +106,7 @@
 
   <div class="banco-bloque">
     <div class="banco-titulo">Banco Activo</div>
-    <div class="banco-desc">Ventas vía Pago Activo · 20 de septiembre</div>
+    <div class="banco-desc">Ventas vía Pago Activo · 20 de septiembre · Tasa fija 974 Bs/€</div>
     <div class="kpis">
       <div class="kpi"><div class="label">Pagos</div><div class="valor" id="act_pagos">—</div></div>
       <div class="kpi"><div class="label">Entradas</div><div class="valor" id="act_entradas">—</div></div>
@@ -126,10 +126,9 @@
     </div>
   </div>
 
-  <!-- ============ BLOQUE PREVENTA (NUEVO) ============ -->
   <div class="banco-bloque">
     <div class="banco-titulo">Preventa (dentro del convenio)</div>
-    <div class="banco-desc">Compradores desde 03/06/2026 · Excluye duplicados y revocados · Tasa BCV euro del día de cada pago</div>
+    <div class="banco-desc">Compradores desde 03/06/2026 · Excluye duplicados y revocados · Pagos normales 50/50 · Paquetes VIP/Leg cuentan como 1 entrada de 5€ (a la tasa menor entre BCV y la reportada) y el resto va al productor</div>
     <div class="kpis">
       <div class="kpi"><div class="label">Compradores</div><div class="valor" id="prv_pagos">—</div></div>
       <div class="kpi"><div class="label">Entradas</div><div class="valor" id="prv_entradas">—</div></div>
@@ -148,7 +147,6 @@
       <tbody id="prv_tabla_detalle_body"></tbody></table>
     </div>
   </div>
-  <!-- ============ FIN BLOQUE PREVENTA ============ -->
 
   <div class="banco-bloque" style="background:#eef3f0;">
     <div class="banco-titulo">Total general (3 bancos + preventa)</div>
@@ -202,6 +200,7 @@ const URL = "https://shnatpwnwezmbhdvshfi.supabase.co";
 const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobmF0cHdud2V6bWJoZHZzaGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzgyNTgsImV4cCI6MjEwNTUxNDI1OH0.2fwqzX6zdr3m0qWCD_brKtdFVeWfcs4FsmAvSBLibN4";
 const TASA = 974;
 const FECHA_CONVENIO = "2026-06-03";
+const ESPECIALES_EXTRA = [176];
 
 const fmtBs = n => n.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const fmtEur = n => n.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -246,17 +245,24 @@ async function cargar(tabla, prefijo) {
   return { pagos: totPagos, entradas: totEntradas, bs: totBs, cop: totCop, prod: totProd };
 }
 
-// ============ NUEVA FUNCIÓN: cargar preventa ============
+// ============ NUEVA FUNCIÓN: cargar preventa con regla acordada ============
 async function cargarPreventa() {
   const [prev, tasas] = await Promise.all([
     fetch(URL + "/rest/v1/preventa?select=*&order=marca_temporal.asc",
       { headers: { apikey: KEY, Authorization: "Bearer " + KEY } }).then(r => r.json()),
-    fetch(URL + "/rest/v1/tasas_bcv?select=fecha,tasa_eur",
+    fetch(URL + "/rest/v1/tasas_bcv?select=fecha,tasa_eur&order=fecha.asc",
       { headers: { apikey: KEY, Authorization: "Bearer " + KEY } }).then(r => r.json())
   ]);
 
-  const tasasMap = {};
-  tasas.forEach(t => tasasMap[t.fecha] = Number(t.tasa_eur));
+  const tasasOrd = tasas.map(t => ({ fecha: t.fecha, tasa: Number(t.tasa_eur) }));
+  function tasaBCV(fechaStr) {
+    let ultima = null;
+    for (const t of tasasOrd) {
+      if (t.fecha <= fechaStr) ultima = t.tasa;
+      else break;
+    }
+    return ultima;
+  }
 
   let comp=0, ent=0, totBs=0, totCop=0, totProd=0, totEurCop=0, totEurProd=0, totEur=0;
   const tbodyDet = document.getElementById("prv_tabla_detalle_body");
@@ -268,40 +274,33 @@ async function cargarPreventa() {
     if (fechaStr < FECHA_CONVENIO) return;
 
     const monto = Number(r.monto_bs || 0);
-    const tasa = tasasMap[fechaStr] || TASA;
-    const valTeo = Number(r.valor_teorico_eur || 0);
+    const tBCV = tasaBCV(fechaStr);
+    const tRep = (r.monto_eur && Number(r.monto_eur) > 0) ? monto / Number(r.monto_eur) : null;
+    let tasa;
+    if (tBCV !== null && tRep !== null) tasa = Math.min(tBCV, tRep);
+    else tasa = tBCV ?? tRep ?? TASA;
+
     const nVip = Number(r.entradas_vip || 0);
     const nLeg = Number(r.entradas_legendario || 0);
     const nPaq = nVip + nLeg;
+    const esEspecial = nPaq > 0 || ESPECIALES_EXTRA.includes(Number(r.id));
 
-    let cop, prod, nota = "";
-
-    // REGLA 3 primero: paquetes VIP/Leg, sin importar el flag
-    if (nPaq > 0) {
-      cop = nPaq * 2.5 * tasa;
-      prod = monto - cop;
-      nota = nPaq + " paquete(s) VIP/Leg · 2,5€ c/u al BCV (" + tasa.toFixed(2) + ") · resto al productor";
-    }
-    // REGLA 2: pago en dólares
-    else if (r.flag_revisar === "pago_dolares") {
-      cop = (valTeo / 2) * tasa;
-      prod = monto - cop;
-      nota = "Pagó USD · 50% del valor teórico (" + valTeo + "€) al BCV";
-    }
-    // REGLA 4: excedente sin paquete → como Regla 2
-    else if (r.flag_revisar === "pago_excedente") {
-      cop = (valTeo / 2) * tasa;
-      prod = monto - cop;
-      nota = "Excedente · valor teórico (" + valTeo + "€) al BCV, 50/50";
-    }
-    // REGLA 1: normal
-    else {
+    let cop, prod, nota;
+    if (esEspecial) {
+      const nEnt = nPaq > 0 ? nPaq : 1;
+      const valorEnt = nEnt * 5 * tasa;
+      const sobrante = monto - valorEnt;
+      cop = valorEnt / 2;
+      prod = valorEnt / 2 + sobrante;
+      nota = "Especial · " + nEnt + " entrada(s) × 5€ (tasa " + tasa.toFixed(2) +
+             ") · sobrante " + fmtBs(sobrante) + " Bs al productor";
+    } else {
       cop = monto / 2; prod = monto / 2;
-      nota = "Pago normal 50/50 en Bs";
+      nota = "Pago normal · 50/50 en Bs";
     }
 
     comp++;
-    ent += Number(r.entradas_total || 0);
+    ent += Number(r.entradas_total || 0) + (nPaq > 0 ? nPaq : 0);
     totBs += monto; totCop += cop; totProd += prod;
     totEurCop += cop / tasa;
     totEurProd += prod / tasa;
@@ -310,7 +309,8 @@ async function cargarPreventa() {
     const cat = (Number(r.entradas_estelar||0)>0 ? "Estelar " : "") +
                 (Number(r.entradas_meteoro||0)>0 ? "Meteoro " : "") +
                 (nVip>0 ? "VIP×" + nVip + " " : "") +
-                (nLeg>0 ? "Leg×" + nLeg : "");
+                (nLeg>0 ? "Leg×" + nLeg + " " : "") +
+                (ESPECIALES_EXTRA.includes(Number(r.id)) && nPaq===0 ? "Especial" : "");
     const tr = document.createElement("tr");
     tr.innerHTML = `<td>${fechaStr}</td><td>${r.nombre || ""}</td><td>${cat.trim()}</td>
       <td class="num">${fmtBs(monto)}</td><td class="num">${tasa.toFixed(2)}</td>
@@ -341,12 +341,12 @@ function pintarCartaA() {
     <p><b>PRIMERO.</b> El reparto 50/50 sobre boletería aplica exclusivamente a las ventas netas generadas desde el 03 de junio de 2026. Las ventas de preventa anteriores a esa fecha (239 entradas de 2025, de las cuales 219 ingresaron al evento) no forman parte de la base de reparto, extremo que se evidencia del cuadre total de brazaletes: 882 usados = 663 dentro del convenio + 219 anteriores.</p>
     <p><b>SEGUNDO.</b> Conciliadas las cuentas del Banco de Venezuela, Banco Mercantil y Banco Activo, el total neto de boletería del evento dentro del convenio asciende a <b>Bs. 1.558.330,00</b> (1.600,34 € a tasa 974 Bs/€). A este monto se suma la boletería de preventa comprendida dentro del convenio, cuyo detalle consta en el dashboard de preventa aprobado por ambas partes.</p>
     <p><b>TERCERO.</b> Distribución de la boletería comprendida dentro del convenio (post-03/06/2026), en dos bloques:</p>
-    <p style="margin-left:20px;">— <b>Preventa:</b> Co-productor <b>816.708,35 Bs</b> (838,51 €) · Productor <b>1.017.337,64 Bs</b> (1.044,49 €).</p>
-    <p style="margin-left:20px;">— <b>Taquilla (3 bancos, 19-21 sep):</b> Co-productor <b>779.165,00 Bs</b> (800,17 €) · Productor <b>779.095,00 Bs</b> (800,10 €), absorbiendo este último 70 Bs del déficit del pago de 4.800 Bs registrado en taquilla.</p>
-    <p>En consecuencia, LA PRODUCTORA se <b>obliga</b> a entregar a EL COPRODUCTOR la cantidad de <b>1.595.873,35 Bs</b> (1.638,68 €), suma de su cuota de preventa más su cuota de taquilla, quedando el productor con el remanente de <b>1.796.432,64 Bs</b> (1.844,39 €).</p>
+    <p style="margin-left:20px;">— <b>Preventa:</b> Co-productor <b>835.830,94 Bs</b> · Productor <b>998.215,05 Bs</b>.</p>
+    <p style="margin-left:20px;">— <b>Taquilla (3 bancos, 19-21 sep):</b> Co-productor <b>779.165,00 Bs</b> · Productor <b>779.095,00 Bs</b>, absorbiendo este último 70 Bs del déficit del pago de 4.800 Bs registrado en taquilla.</p>
+    <p>En consecuencia, LA PRODUCTORA se <b>obliga</b> a entregar a EL COPRODUCTOR la cantidad de <b>1.614.995,94 Bs</b>, suma de su cuota de preventa más su cuota de taquilla, quedando el productor con el remanente de <b>1.777.310,05 Bs</b>.</p>
     <p><b>CUARTO.</b> El aporte correspondiente a provisión de gasoil y personal operativo por <b>USD $1.580,00</b> fue debidamente cubierto en su equivalente en bolívares a la tasa oficial del BCV vigente al momento del pago, y se reconoce como plenamente cumplido y finiquitado.</p>
     <p><b>QUINTO.</b> La atracción del colchón inflable prevista en el contrato no pudo ser instalada ni operada en virtud de que la potencia eléctrica requerida excedía la capacidad máxima de generación disponible en el recinto. Dicha obligación quedó extinguida por imposibilidad técnica de cumplimiento, no imputable a dolo ni negligencia de ninguna de las partes.</p>
-    <p><b>SEXTO.</b> En consecuencia, el monto total a pagar por LA PRODUCTORA a EL COPRODUCTOR por el evento es de <b>1.595.873,35 Bs</b> (1.638,68 €), resultado de sumar su cuota de boletería de preventa y su cuota de boletería de taquilla, ya detalladas en el TERCERO.</p>
+    <p><b>SEXTO.</b> En consecuencia, el monto total a pagar por LA PRODUCTORA a EL COPRODUCTOR por el evento es de <b>1.614.995,94 Bs</b>, resultado de sumar su cuota de boletería de preventa y su cuota de boletería de taquilla, ya detalladas en el TERCERO.</p>
     <p><b>SÉPTIMO.</b> Ambas partes se otorgan el más amplio finiquito recíproco, declarando extinguidas todas las obligaciones, reclamos, diferencias o responsabilidades derivadas del contrato de coproducción, sin que quede pendiente reclamación alguna por ningún concepto.</p>
     <p>Se firman dos ejemplares en la ciudad de Valencia, a los ____ días del mes de ________ de 2026.</p>
     <div class="firma">
@@ -357,22 +357,22 @@ function pintarCartaA() {
 }
 
 function pintarCartaB(montoDanos) {
-  const copBase = 779165.00;
+  const copBase = 1614995.94;
   const neto = copBase - montoDanos;
   document.getElementById("carta_render").innerHTML = `
   <div class="carta">
     <h3>CARTA DE CIERRE, FINIQUITO Y CONFIDENCIALIDAD — EVENTO NITROTOON</h3>
     <p>Entre los suscritos, <b>ZULMI MARIETA ESPARRAGOZA DE RAMOS</b>, en su carácter de Vicepresidente de <b>EVENTOS Y PRODUCCIONES LUNA, C.A.</b> (LA PRODUCTORA), y <b>RAFAEL ENRIQUE MARQUEZ SANCHEZ</b> (EL COPRODUCTOR), hemos revisado de mutuo acuerdo el balance final del evento <b>NITROTOON</b>, celebrado los días 19 y 20 de septiembre de 2026, y declaramos:</p>
     <p><b>PRIMERO.</b> El reparto 50/50 sobre boletería aplica exclusivamente a las ventas netas generadas desde el 03 de junio de 2026. Las ventas de preventa anteriores a esa fecha (219 ingresaron al evento) no forman parte de la base de reparto. Cuadre total de brazaletes: 882 usados = 663 dentro del convenio + 219 anteriores.</p>
-    <p><b>SEGUNDO.</b> Conciliadas las cuentas de los tres bancos, el total neto de boletería del evento dentro del convenio asciende a <b>Bs. 1.558.330,00</b> (1.600,34 €), más la boletería de preventa comprendida dentro del convenio.</p>
+    <p><b>SEGUNDO.</b> Conciliadas las cuentas de los tres bancos, el total neto de boletería del evento dentro del convenio asciende a <b>Bs. 1.558.330,00</b>, más la boletería de preventa comprendida dentro del convenio.</p>
     <p><b>TERCERO.</b> Distribución de la boletería comprendida dentro del convenio (post-03/06/2026), en dos bloques:</p>
-    <p style="margin-left:20px;">— <b>Preventa:</b> Co-productor <b>816.708,35 Bs</b> (838,51 €) · Productor <b>1.017.337,64 Bs</b> (1.044,49 €).</p>
-    <p style="margin-left:20px;">— <b>Taquilla (3 bancos, 19-21 sep):</b> Co-productor <b>779.165,00 Bs</b> (800,17 €) · Productor <b>779.095,00 Bs</b> (800,10 €), absorbiendo este último 70 Bs del déficit del pago de 4.800 Bs registrado en taquilla.</p>
-    <p>En consecuencia, LA PRODUCTORA se <b>obliga</b> a entregar a EL COPRODUCTOR la cantidad de <b>1.595.873,35 Bs</b> (1.638,68 €), suma de su cuota de preventa más su cuota de taquilla, quedando el productor con el remanente de <b>1.796.432,64 Bs</b> (1.844,39 €).</p>
+    <p style="margin-left:20px;">— <b>Preventa:</b> Co-productor <b>835.830,94 Bs</b> · Productor <b>998.215,05 Bs</b>.</p>
+    <p style="margin-left:20px;">— <b>Taquilla (3 bancos, 19-21 sep):</b> Co-productor <b>779.165,00 Bs</b> · Productor <b>779.095,00 Bs</b>, absorbiendo este último 70 Bs del déficit del pago de 4.800 Bs registrado en taquilla.</p>
+    <p>En consecuencia, LA PRODUCTORA se <b>obliga</b> a entregar a EL COPRODUCTOR la cantidad de <b>1.614.995,94 Bs</b>, suma de su cuota de preventa más su cuota de taquilla, quedando el productor con el remanente de <b>1.777.310,05 Bs</b>.</p>
     <p><b>CUARTO.</b> Aporte de gasoil y personal operativo por <b>USD $1.580,00</b> debidamente cubierto en su equivalente en bolívares a tasa BCV, reconocido como finiquitado.</p>
     <p><b>QUINTO.</b> La atracción del colchón inflable no pudo instalarse por exceder la potencia eléctrica disponible en el recinto. Obligación extinguida por imposibilidad técnica, sin responsabilidad para ninguna parte.</p>
-    <p><b>SEXTO.</b> En consecuencia, el monto total a pagar por LA PRODUCTORA a EL COPRODUCTOR por el evento es de <b>1.595.873,35 Bs</b> (1.638,68 €), resultado de sumar su cuota de boletería de preventa y su cuota de boletería de taquilla, ya detalladas en el TERCERO.</p>
-    <p><b>SÉPTIMO.</b> Aplicada la compensación, el monto total a pagar por LA PRODUCTORA a EL COPRODUCTOR por el evento asciende a <b>${fmtBs(neto)} Bs</b> (${fmtEur(neto/TASA)} €), más la cuota de preventa según el dashboard aprobado.</p>
+    <p><b>SEXTO.</b> Ambas partes reconocen que, durante el evento, la falla eléctrica afectó la operatividad de seis (6) stands de comida, ocasionando pérdida de productos perecederos y obligando a LA PRODUCTORA a realizar una devolución por <b>${fmtBs(montoDanos)} Bs</b>. En virtud de que el suministro eléctrico operativo correspondía al ámbito operativo de EL COPRODUCTOR (cláusula quinta del contrato), dicho monto se compensa con su cuota sobre la boletería, conforme a los artículos 1.185 y 1.331 del Código Civil Venezolano.</p>
+    <p><b>SÉPTIMO.</b> Aplicada la compensación, el monto total a pagar por LA PRODUCTORA a EL COPRODUCTOR asciende a <b>${fmtBs(neto)} Bs</b>.</p>
     <p><b>OCTAVO.</b> Ambas partes se otorgan el más amplio finiquito recíproco, declarando extinguidas todas las obligaciones, reclamos, diferencias o responsabilidades derivadas del contrato de coproducción.</p>
     <p>Se firman dos ejemplares en la ciudad de Valencia, a los ____ días del mes de ________ de 2026.</p>
     <div class="firma">
@@ -395,7 +395,6 @@ async function cargarTodo() {
     const cop      = bdv.cop + mrc.cop + act.cop + prv.cop;
     const prod     = bdv.prod + mrc.prod + act.prod + prv.prod;
 
-    // € del evento a tasa fija 974; € de preventa con su propia tasa por fila
     const eurCopEvento  = (bdv.cop + mrc.cop + act.cop) / TASA;
     const eurProdEvento = (bdv.prod + mrc.prod + act.prod) / TASA;
     const eurCop = eurCopEvento + prv.eurCop;
