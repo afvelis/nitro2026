@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Reclamos - Evento NITROTOON</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: #f4f5f7;
+    color: #2c3e50;
+    padding: 30px 20px;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 8px;
+    padding: 40px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .header {
+    border-bottom: 3px solid #2c3e50;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+  }
+  .header h1 {
+    font-size: 22px;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: #7f8c8d;
+    letter-spacing: 0.5px;
+  }
+  .header .meta {
+    margin-top: 15px;
+    font-size: 12px;
+    color: #555;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .header .meta span { background: #f0f0f0; padding: 4px 10px; border-radius: 3px; }
+  .intro {
+    background: #fafbfc;
+    border-left: 4px solid #2c3e50;
+    padding: 15px 20px;
+    margin-bottom: 30px;
+    font-size: 14px;
+    color: #444;
+  }
+  .claim {
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    overflow: hidden;
+  }
+  .claim-header {
+    background: #2c3e50;
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .claim-header .rank {
+    background: #c0392b;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .claim-header .title { font-size: 15px; font-weight: 600; }
+  .claim-header .amount { font-size: 14px; font-weight: bold; }
+  .claim-body { padding: 20px; }
+  .claim-body .field { margin-bottom: 15px; }
+  .claim-body .field-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+  .claim-body .field-value { font-size: 14px; color: #333; }
+  .quote-box {
+    background: #f9f9f9;
+    border-left: 3px solid #c0392b;
+    padding: 15px 20px;
+    margin: 15px 0;
+    font-style: italic;
+    font-size: 14px;
+    color: #333;
+    white-space: pre-wrap;
+  }
+  .quote-box .author {
+    display: block;
+    text-align: right;
+    font-size: 12px;
+    color: #7f8c8d;
+    font-style: normal;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  .link-placeholder {
+    background: #fff8e1;
+    border: 1px dashed #f39c12;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #8a6d00;
+    margin-top: 10px;
+  }
+  .link-placeholder strong { color: #c0392b; }
+  .impact-tag {
+    display: inline-block;
+    background: #c0392b;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+  .impact-tag.public { background: #8e44ad; }
+  .impact-tag.venue { background: #27ae60; }
+  .formal-letter {
+    background: white;
+    border: 2px solid #2c3e50;
+    padding: 30px;
+    margin: 15px 0;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #000;
+  }
+  .formal-letter .letter-header {
+    margin-bottom: 30px;
+  }
+  .formal-letter .letter-date {
+    text-align: right;
+    margin-bottom: 20px;
+  }
+  .formal-letter .letter-subject {
+    font-weight: bold;
+    margin: 20px 0;
+    text-decoration: underline;
+  }
+  .formal-letter p {
+    margin-bottom: 15px;
+    text-align: justify;
+  }
+  .formal-letter .signature {
+    margin-top: 40px;
+  }
+  .footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    text-align: center;
+    font-size: 11px;
+    color: #95a5a6;
+  }
+  .btn-print {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  @media print {
+    .btn-print { display: none; }
+    body { background: white; padding: 0; }
+    .container { box-shadow: none; padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar como PDF</button>
+
+<div class="container">
+  <div class="header">
+    <h1>Registro de Reclamos - Evento NITROTOON</h1>
+    <div class="subtitle">Evento NITROTOON · 19 y 20 de Septiembre de 2026 · Carpa Luna, Naguanagua</div>
+    <div class="meta">
+      <span>📅 Generado: 24 de septiembre de 2026</span>
+      <span>📋 Total de evidencias: 5</span>
+      <span>⚠️ Causa común: Falla eléctrica del recinto</span>
+    </div>
+  </div>
+
+  <div class="intro">
+    <strong>Objeto del documento:</strong> El presente registro recopila todos los reclamos formales recibidos y presentados en relación al evento NITROTOON, ordenados por magnitud de impacto. Cada sección incluye la transcripción textual de la evidencia para fines de auditoría y conciliación contractual.
+  </div>
+
+  <!-- RECLAMO 1 -->
+  <div class="claim">
+    <div class="claim-header">
+      <div>
+        <span class="rank">MAGNITUD #1</span>
+        <span class="title" style="margin-left:10px;">Reembolso de Stand - Jhoandry González</span>
+      </div>
+      <span class="amount">USD $450.00 exigidos</span>
+    </div>
+    <div class="claim-body">
+      <div class="field">
+        <div class="field-label">Tipo de afectación</div>
+        <div class="field-value">Pérdida total de inversión del stand por falla eléctrica. Imposibilidad de operar el servicio de estampado y personalización en vivo durante el día sábado.</div>
+        <span class="impact-tag">Impacto económico directo</span>
+      </div>
+      <div class="field">
+        <div class="field-label">Hechos reportados</div>
+        <div class="field-value">
+          • El breque eléctrico se disparaba constantemente, impidiendo enchufar la plancha.<br>
+          • Fue necesario contratar un electricista para conexión directa, resuelto a las 5:30 p.m. (casi al finalizar el evento).<br>
+          • El sábado era el cumpleaños de la bebé de los afectados, a quienes se les obligó a trabajar.<br>
+          • Expresan descontento acumulado desde eventos anteriores.
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Transcripción textual de la evidencia</div>
+        <div class="quote-box">"Hola Rafael buenas noches, disculpa la hora, les escribo porque me siento inconforme con el servicio eléctrico que hubo en el evento el dia sabado, recuerden que yo iba al evento a estampar y personalizar en vivo solo el día sábado porque el dia de hoy cumplía años mi bebé, pero lamentablemente el día sábado no hubo manera de enchufar la plancha porque se disparaba el breque a cada rato, nos tocó llamar a un electricista para que nos hiciera una conexion directa y nos resolvieron a las 5:30 de la tarde, a partir de esa hora fue que pudimos trabajar, ya se estaba terminando el evento
+
+Eso es algo que definitivamente nos afectó muchísimo tanto a nivel económico como a nivel personal, porque para nosotros como padres ir a trabajar el día del cumpleaños de nuestra beba era un NO rotundo, pero nos tocó ir hoy a ver si recuperábamos algo de todo el dinero que habíamos invertido y que no pudimos producir por el problema eléctrico
+
+desde que hemos ido a sus eventos primera vez que tenemos un descontento como estos y esta vez habíamos apostado mucho para estampar el día sábado
+
+es por eso que les exijo que por favor me reembolsen los 450$ en efectivo que cancele por el stand"<span class="author">— Jhoandry Gon... (WhatsApp, lunes post-evento)</span></div>
+      </div>
+      <div class="link-placeholder">
+        🔗 <strong>Evidencia adjunta:</strong> [Captura de conversación WhatsApp - Jhoandry González] · <em>Link de evidencia: _______________</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECLAMO 2 -->
+  <div class="claim">
+    <div class="claim-header">
+      <div>
+        <span class="rank">MAGNITUD #2</span>
+        <span class="title" style="margin-left:10px;">Daño a equipo técnico - Cesar (Pantallas/Sonido)</span>
+      </div>
+      <span class="amount">Equipo dañado (costo por determinar)</span>
+    </div>
+    <div class="claim-body">
+      <div class="field">
+        <div class="field-label">Tipo de afectación</div>
+        <div class="field-value">Quemadura del controlador de la tarjeta externa del equipo de pantallas por falla eléctrica del recinto. Equipo sin reparación, requiere reemplazo total. Adicionalmente, fue necesario reforzar el sonido por mala acústica del lugar.</div>
+        <span class="impact-tag">Daño material a equipo propio</span>
+      </div>
+      <div class="field">
+        <div class="field-label">Hechos reportados</div>
+        <div class="field-value">
+          • La electricidad del lugar quemó el controlador de la tarjeta externa.<br>
+          • Es la primera vez que le ocurre trabajando con Rafael.<br>
+          • El equipo no tiene reparación, debe comprar uno nuevo.<br>
+          • Tuvo que reforzar el sonido adicionalmente porque el lugar no concentra bien.
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Transcripción textual de la evidencia</div>
+        <div class="quote-box">"Hola Rafael como estas? Ya ví cual fue el problema con la pantalla, la electricidad del lugar me quemo el controlador de la tarjeta externa, coño pana primera vez que me pasa esa vaina contigo, ahora debo comprar una esa no tiene reparación sabes que trabajo con eso y aparte me toco reforzar el sonido ese lugar no concentra bien, dime quien me paga mi vaina voy a estar parado ahora con eso.
+
+Así no podemos seguir trabajando querido"<span class="author">— Cesar Pantall... (WhatsApp, 1:49 p.m.)</span></div>
+      </div>
+      <div class="link-placeholder">
+         <strong>Evidencia adjunta:</strong> [Captura de conversación WhatsApp - Cesar] · <em>Link de evidencia: _______________</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECLAMO 3 -->
+  <div class="claim">
+    <div class="claim-header">
+      <div>
+        <span class="rank">MAGNITUD #3</span>
+        <span class="title" style="margin-left:10px;">Informe técnico formal - Fibex Telecom</span>
+      </div>
+      <span class="amount">Daño reputacional / sin monto específico</span>
+    </div>
+    <div class="claim-body">
+      <div class="field">
+        <div class="field-label">Tipo de afectación</div>
+        <div class="field-value">Informe técnico formal que documenta la falla operativa de las pantallas durante el evento. Aunque no se exige reembolso, constituye evidencia oficial de que la causa raíz fue la infraestructura eléctrica del recinto, no el proveedor.</div>
+        <span class="impact-tag">Evidencia documental oficial</span>
+      </div>
+      <div class="field">
+        <div class="field-label">Hechos reportados</div>
+        <div class="field-value">
+          • Calidad y rendimiento de pantallas no alcanzaron máximo potencial operativo.<br>
+          • Causa raíz: fluctuaciones y bajo voltaje del suministro eléctrico del recinto.<br>
+          • El equipo técnico realizó todos los ajustes posibles en tiempo real.<br>
+          • La falla es atribuible a la infraestructura eléctrica externa del lugar.
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Transcripción textual del informe</div>
+        <div class="quote-box">"INFORME DE GESTIÓN/ EVENTO NITROTOON
+De: Equipo de Eventos de Fibex Telecom
+Fecha: 22 de septiembre de 2026
+Asunto: Incidencia técnica con pantallas durante el evento Nitrotoon
+
+Por medio del presente informe, la Coordinación de Eventos rinde cuentas respecto al desenvolvimiento de las pantallas proyectadas para el evento Nitrotoon.
+
+Resumen de la incidencia: Durante el desarrollo de la actividad, la calidad y el rendimiento del despliegue en las pantallas no alcanzaron su máximo potencial operativo debido a las fluctuaciones y al bajo voltaje del suministro eléctrico presente en las instalaciones del recinto.
+
+Acciones de mitigación y aclaratoria:
+• Gestión técnica en el sitio: Nuestro equipo técnico realizó todos los ajustes, revisiones de cableado, balanceo de carga e intentos de estabilización posibles en tiempo real para mantener los equipos funcionando a su máxima capacidad.
+• Causa raíz: La falla radicó estrictamente en la infraestructura eléctrica externa del lugar, un factor fuera de las capacidades de control, calibración o responsabilidad operativa del equipo de eventos de Fibex Telecom.
+
+Reiteramos nuestro compromiso incondicional con la excelencia en la ejecución de cada actividad corporativa y nos mantenemos a disposición para coordinar requerimientos técnicos y exigencias de infraestructura en próximos eventos.
+
+Atentamente,
+Coordinación de Eventos Fibex Telecom"<span class="author">— Informe oficial Fibex Telecom, 22 sept 2026</span></div>
+      </div>
+      <div class="link-placeholder">
+        🔗 <strong>Evidencia adjunta:</strong> [Informe_Nitrotoon.pdf] · <em>Link de evidencia: _______________</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECLAMO 4: PÚBLICO EN GENERAL -->
+  <div class="claim">
+    <div class="claim-header">
+      <div>
+        <span class="rank">MAGNITUD #4</span>
+        <span class="title" style="margin-left:10px;">Daño a imagen pública - Redes sociales (Instagram)</span>
+      </div>
+      <span class="amount">Daño reputacional público</span>
+    </div>
+    <div class="claim-body">
+      <div class="field">
+        <div class="field-label">Tipo de afectación</div>
+        <div class="field-value">Evidencia pública en redes sociales (Instagram Stories) que documenta el parpadeo constante de la pantalla gigante del escenario (se apagaba y encendía repetidamente). Cada corte de energía cerraba la presentación en curso, devolviendo la imagen al explorador de archivos de Windows, obligando al operador a reiniciarla constantemente frente al público. La publicación se burla de la inestabilidad del equipo, no del contenido proyectado.</div>
+        <span class="impact-tag public">Daño a imagen pública</span>
+      </div>
+      <div class="field">
+        <div class="field-label">Hechos reportados</div>
+        <div class="field-value">
+          • La pantalla gigante del escenario parpadeaba constantemente (se apagaba y encendía) durante el show.<br>
+          • Cada corte de voltaje cerraba la presentación (PowerPoint/contenido visual), mostrando el explorador de archivos de Windows en la pantalla.<br>
+          • El operador debía reiniciar la presentación repetidamente, interrumpiendo el espectáculo.<br>
+          • La captura fue publicada en Instagram Stories por el usuario @patodoelmundo_ post-evento.<br>
+          • Un seguidor (@yoam07) comentó públicamente: "pero no servía la pantalla 😂", confirmando que la falla fue percibida por la audiencia.<br>
+          • La publicación incluye música de fondo "The Hit Crew - Circus Music", en tono de burla hacia la inestabilidad del equipo.
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Transcripción textual de la evidencia</div>
+        <div class="quote-box">Publicación en Instagram Stories:
+Usuario: @patodoelmundo_
+Música de fondo: The Hit Crew - Circus Music
+[Imagen: Pantalla gigante del escenario mostrando el explorador de archivos de Windows, con un artista bailando frente a ella. La imagen evidencia que la presentación se cerró por un corte de voltaje, dejando visible el escritorio del computador]
+
+Comentario público de seguidor:
+@yoam07: "pero no servía la pantalla "<span class="author">— Instagram Stories, captura tomada 24 sept 2026</span></div>
+      </div>
+      <div class="field">
+        <div class="field-label">Correlación con otras evidencias</div>
+        <div class="field-value">
+          Esta evidencia pública es consistente con el Informe Técnico de Fibex Telecom (Reclamo #3), que atribuye la causa raíz a "fluctuaciones y bajo voltaje del suministro eléctrico del recinto". El parpadeo de la pantalla y el cierre forzado de la presentación son síntomas típicos de inestabilidad eléctrica, no de falla del equipo de proyección. Refuerza el argumento de que la causa raíz fue la infraestructura eléctrica de La Carpa Luna.
+        </div>
+      </div>
+      <div class="link-placeholder">
+        🔗 <strong>Evidencia adjunta:</strong> [Captura Instagram Stories - @patodoelmundo_] · <em>Link de evidencia: _______________</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECLAMO 5: CARTA FORMAL AL RECINTO -->
+  <div class="claim">
+    <div class="claim-header">
+      <div>
+        <span class="rank" style="background:#27ae60;">EVIDENCIA #5</span>
+        <span class="title" style="margin-left:10px;">Reclamo Formal del Productor al Recinto (La Carpa Luna)</span>
+      </div>
+      <span class="amount" style="background:#27ae60;">Notificación formal</span>
+    </div>
+    <div class="claim-body">
+      <div class="field">
+        <div class="field-label">Tipo de documento</div>
+        <div class="field-value">Carta formal de reclamo presentada por EL PRODUCTOR (Rafael Márquez) a La Carpa Luna como recinto responsable de la infraestructura eléctrica. Este documento demuestra que el Productor también fue víctima de las fallas del recinto y que notificó formalmente el problema.</div>
+        <span class="impact-tag venue">Reclamo presentado por EL PRODUCTOR</span>
+      </div>
+      <div class="field">
+        <div class="field-label">Aspectos críticos documentados</div>
+        <div class="field-value">
+          • Fallas graves y continuas en pantalla LED de última generación contratada.<br>
+          • Causa: inconvenientes eléctricos y de suministro de corriente del recinto.<br>
+          • Impacto en contenido de producción: semanas de trabajo gráfico invisibilizadas.<br>
+          • Impacto en concursos: competencias de Cosplay y K-pop sin videos por fallas eléctricas.<br>
+          • Daño reputacional: el público percibió la falla como irresponsabilidad de Nitrotoon.<br>
+          • Notificación formal de las consecuencias sin solicitud de compensación.
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Transcripción textual de la carta formal</div>
+        <div class="formal-letter">
+          <div class="letter-header">
+            <strong>DE:</strong> Rafael Enrique Márquez Sánchez<br>
+            <strong>C.I.:</strong> V-15.007.757<br>
+            <strong>En mi calidad de:</strong> Productor del Evento NITROTOON<br><br>
+            <strong>PARA:</strong> La Carpa Luna<br>
+            <strong>DIRECCIÓN:</strong> Avenida Principal, Manzana N° 4, Local N° 4<br>
+            Urbanización Ciudad Jardín Mañongo<br>
+            Municipio Naguanagua, Estado Carabobo
+          </div>
+          
+          <div class="letter-date">
+            Valencia, 24 de septiembre de 2026
+          </div>
+
+          <div class="letter-subject">
+            ASUNTO: Reclamo Formal por Fallas en Servicio de Pantalla LED Durante Evento NITROTOON (19-20 de Septiembre de 2026)
+          </div>
+
+          <p>Me dirijo a ustedes en mi condición de Productor del evento NITROTOON para formular reclamo formal por las deficiencias técnicas ocurridas durante la realización del espectáculo, específicamente en lo concerniente al funcionamiento de la pantalla LED contratada para el recinto.</p>
+
+          <p>El equipo presentó fallas graves y continuas derivadas de irregularidades en el suministro eléctrico e inestabilidad de voltaje. Esta situación impidió la visualización y transmisión de los contenidos audiovisuales que nuestro equipo de producción diseñó, editó y preparó minuciosamente durante semanas de trabajo.</p>
+
+          <p><strong>CONSECUENCIAS DIRECTAS DE LA FALLA:</strong></p>
+
+          <p><strong>1. Contenido de la producción:</strong> Las pantallas permanecieron inoperativas en momentos críticos del evento, imposibilitando la visualización del trabajo gráfico, videos institucionales y elementos de ambientación diseñados para la marca NITROTOON.</p>
+
+          <p><strong>2. Participantes y competencias:</strong> Las competencias de Cosplay y K-pop, las cuales contaban con reglamentos estrictos que exigían apoyo audiovisual para cada participante, se vieron severamente afectadas. La imposibilidad de reproducir los vídeos de presentación generó molestia generalizada y desconcierto entre los concursantes, incumpliendo con lo pactado en las bases del evento.</p>
+
+          <p><strong>3. Reputación de NITROTOON:</strong> Frente al público asistente y los participantes, la falla técnica fue percibida de manera inmediata como irresponsabilidad y desorganización por parte de NITROTOON, cuando en realidad el origen del problema radicó exclusivamente en las deficiencias eléctricas y técnicas del recinto La Carpa Luna.</p>
+
+          <p><strong>4. Daño a la imagen comercial:</strong> Como producción, hemos asumido de forma injusta el daño reputacional y el descontento de la comunidad, situaciones provocadas directamente por el incumplimiento en la prestación adecuada del servicio de infraestructura eléctrica por parte del recinto.</p>
+
+          <p>Por medio de la presente, <strong>dejamos constancia formal de nuestra protesta</strong> por los hechos ocurridos y hacemos de su conocimiento que el incumplimiento en el suministro eléctrico adecuado ha generado perjuicios significativos a la ejecución del espectáculo y a la imagen comercial de NITROTOON.</p>
+
+          <p>Solicitamos una respuesta formal que detalle las causas exactas de las fallas eléctricas registradas durante los días 19 y 20 de septiembre de 2026.</p>
+
+          <div class="signature">
+            Atentamente,<br><br><br>
+            _________________________________<br>
+            <strong>RAFAEL ENRIQUE MÁRQUEZ SÁNCHEZ</strong><br>
+            C.I. V-15.007.757<br>
+            PRODUCTOR - EVENTO NITROTOON
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Importancia legal de esta evidencia</div>
+        <div class="field-value">
+          Esta carta formal demuestra que:<br>
+          1) EL PRODUCTOR (Rafael) también fue afectado por las fallas eléctricas del recinto.<br>
+          2) Se notificó formalmente al recinto sobre el problema, estableciendo responsabilidad.<br>
+          3) El daño reputacional afectó directamente a Nitrotoon, aunque la causa fue la infraestructura de La Carpa Luna.<br>
+          4) Quedó constancia documental de las consecuencias sin solicitar compensación económica, enfocándose únicamente en el reclamo formal.<br>
+          5) Corrobora todas las demás evidencias (Fibex, Cesar, Instagram) apuntando a la misma causa raíz: deficiencias eléctricas del recinto.
+        </div>
+      </div>
+      <div class="link-placeholder">
+         <strong>Evidencia adjunta:</strong> [Carta_Reclamo_La_Carpa_Luna.pdf] · <em>Link de evidencia: _______________</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Documento generado para fines de conciliación contractual y auditoría interna · Evento NITROTOON · Septiembre 2026
+  </div>
+</div>
+
+</body>
+</html>
