@@ -122,6 +122,45 @@
   .btn-secondary:hover {
     background: rgba(27,58,43,.08);
   }
+  /* ═══ ANEXO LEGAL ═══ */
+  .anexo {
+    background: #fff;
+    border: 1px solid #cfd8d2;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-top: 20px;
+    box-shadow: 0 2px 10px rgba(27,58,43,.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .anexo .badge-anexo {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(27,58,43,.08);
+    color: #5a7a6a;
+    border-radius: 100px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .anexo h2 {
+    font-size: 18px;
+    color: #1b3a2b;
+    margin-bottom: 6px;
+    letter-spacing: -.3px;
+  }
+  .anexo-desc {
+    font-size: 13px;
+    color: #5a7a6a;
+    line-height: 1.6;
+    max-width: 560px;
+  }
+  .anexo-acciones { flex-shrink: 0; }
   .footer {
     text-align: center;
     font-size: 11px;
@@ -145,6 +184,7 @@
   @media (max-width: 640px) {
     .cards { grid-template-columns: 1fr; }
     .header h1 { font-size: 24px; }
+    .anexo { flex-direction: column; align-items: flex-start; }
   }
 </style>
 </head>
@@ -197,6 +237,22 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- ═══ ANEXO LEGAL ═══ -->
+  <div class="anexo">
+    <div>
+      <div class="badge-anexo">Anexo legal</div>
+      <h2>Solicitud de conciliación</h2>
+      <p class="anexo-desc">
+        Documento complementario que forma parte del expediente del evento. Se incluye para consideración de las partes durante la fase de revisión y análisis del acuerdo suscrito.
+      </p>
+    </div>
+    <div class="anexo-acciones">
+      <a href="anexo_conciliacion.html" target="_blank" class="btn btn-primary">
+        📑 Ver anexo legal
+      </a>
+    </div>
   </div>
 
   <div class="footer">
