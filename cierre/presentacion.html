@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nitrotoon 2026 · Presentación Final</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #eef3f0;
+    color: #1b3a2b;
+    overflow: hidden;
+  }
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: rgba(27,58,43,.1);
+    z-index: 100;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #1b3a2b;
+    transition: width .4s ease;
+  }
+  .header {
+    position: fixed;
+    top: 12px; left: 20px; right: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #5a7a6a;
+    z-index: 50;
+  }
+  .header .brand { font-weight: bold; color: #1b3a2b; }
+  .header .counter { font-variant-numeric: tabular-nums; }
+  
+  .slides {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 60px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s ease, visibility .5s;
+    text-align: center;
+  }
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* ═══════ SLIDE 1: TÍTULO ═══════ */
+  .slide-title {
+    background: linear-gradient(135deg, #1b3a2b 0%, #2a5540 100%);
+    color: #fff;
+  }
+  .slide-title .eyebrow {
+    font-size: 14px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    opacity: .75;
+    margin-bottom: 24px;
+  }
+  .slide-title h1 {
+    font-size: clamp(40px, 7vw, 72px);
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .slide-title .sub {
+    font-size: clamp(14px, 1.6vw, 18px);
+    opacity: .85;
+    max-width: 720px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+  .slide-title .fecha {
+    font-size: 13px;
+    letter-spacing: 3px;
+    opacity: .6;
+    text-transform: uppercase;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,.25);
+  }
+  .slide-title .partes {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+    font-size: 12px;
+    opacity: .7;
+  }
+
+  /* ═══════ SLIDES 2-5: CONTENIDO ═══════ */
+  .slide-content {
+    background: #eef3f0;
+  }
+  .slide-content .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(27,58,43,.1);
+    color: #1b3a2b;
+    border-radius: 100px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 22px;
+  }
+  .slide-content h2 {
+    font-size: clamp(32px, 5vw, 52px);
+    color: #1b3a2b;
+    margin-bottom: 20px;
+    letter-spacing: -.5px;
+  }
+  .slide-content .desc {
+    font-size: clamp(14px, 1.5vw, 17px);
+    color: #4a6b5b;
+    max-width: 720px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+  .slide-content .icon-big {
+    font-size: 68px;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .btn-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 36px;
+    background: #1b3a2b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: Georgia, serif;
+    font-weight: bold;
+    letter-spacing: .5px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all .2s;
+    box-shadow: 0 4px 14px rgba(27,58,43,.25);
+  }
+  .btn-link:hover {
+    background: #2a5540;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(27,58,43,.35);
+  }
+  .btn-link.disabled {
+    background: #9db0a5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .btn-link.disabled:hover {
+    transform: none;
+    background: #9db0a5;
+    box-shadow: none;
+  }
+  .pista {
+    margin-top: 22px;
+    font-size: 12px;
+    color: #8a9d92;
+    font-style: italic;
+  }
+
+  /* ═══════ NAVEGACIÓN ═══════ */
+  .nav {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    z-index: 50;
+    background: rgba(255,255,255,.9);
+    backdrop-filter: blur(10px);
+    padding: 10px 18px;
+    border-radius: 100px;
+    box-shadow: 0 4px 20px rgba(27,58,43,.15);
+  }
+  .nav button {
+    background: #1b3a2b;
+    color: #fff;
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav button:hover:not(:disabled) {
+    background: #2a5540;
+    transform: scale(1.08);
+  }
+  .nav button:disabled {
+    opacity: .25;
+    cursor: not-allowed;
+  }
+  .nav .dots {
+    display: flex;
+    gap: 6px;
+    padding: 0 6px;
+  }
+  .nav .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(27,58,43,.25);
+    cursor: pointer;
+    transition: all .3s;
+  }
+  .nav .dot.active {
+    background: #1b3a2b;
+    transform: scale(1.4);
+  }
+  .nav .dot:hover {
+    background: #2a5540;
+  }
+
+  @media (max-width: 640px) {
+    .slide { padding: 70px 24px 100px; }
+    .slide-title .partes { flex-direction: column; gap: 12px; }
+    .nav { bottom: 12px; }
+    .nav button { width: 36px; height: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="header">
+  <span class="brand">Nitrotoon 2026</span>
+  <span class="counter"><span id="curNum">1</span> / 5</span>
+</div>
+
+<div class="slides">
+
+  <!-- ═══════ SLIDE 1 · TÍTULO ═══════ -->
+  <section class="slide slide-title active" data-slide="1">
+    <div class="eyebrow">Presentación Final</div>
+    <h1>NITROTOON</h1>
+    <div class="sub">
+      Cierre, finiquito y conciliación del evento celebrado los días 19 y 20 de septiembre de 2026 en La Carpa Luna, Naguanagua.
+    </div>
+    <div class="partes">
+      <div><strong>Productora</strong><br>Eventos y Producciones Luna, C.A.</div>
+      <div><strong>Co-productor</strong><br>Rafael Enrique Márquez Sánchez</div>
+    </div>
+    <div class="fecha" style="margin-top:32px;">Septiembre 2026 · Valencia, Venezuela</div>
+  </section>
+
+  <!-- ═══════ SLIDE 2 · RESULTADOS ═══════ -->
+  <section class="slide slide-content" data-slide="2">
+    <span class="icon-big">📊</span>
+    <div class="badge">Slide 02</div>
+    <h2>Resultados del evento</h2>
+    <div class="desc">
+      Balance consolidado de la taquilla, la preventa y los gastos operativos. Incluye el reparto 50/50 entre productora y co-productor, el detalle de las evidencias bancarias y el cuadre final del convenio.
+    </div>
+    <a class="btn-link" href="resumen_evento.html" target="_blank">
+      📄 Ver informe completo →
+    </a>
+    <div class="pista">Se abre en una pestaña nueva</div>
+  </section>
+
+  <!-- ═══════ SLIDE 3 · QUEJAS ═══════ -->
+  <section class="slide slide-content" data-slide="3">
+    <span class="icon-big">⚠️</span>
+    <div class="badge">Slide 03</div>
+    <h2>Registro de reclamos</h2>
+    <div class="desc">
+      Documentación de los reclamos formales recibidos por la falla eléctrica del recinto: stand de Jhoandry González, daño al equipo técnico de Cesar, informe de Fibex Telecom, impacto en redes sociales y notificación formal a La Carpa Luna.
+    </div>
+    <a class="btn-link" href="reclamosupdate.html" target="_blank">
+      📋 Ver reclamos →
+    </a>
+    <div class="pista">5 evidencias · Causa común: falla eléctrica del recinto</div>
+  </section>
+
+  <!-- ═══════ SLIDE 4 · PUBLICIDAD ═══════ -->
+  <section class="slide slide-content" data-slide="4">
+    <span class="icon-big">📣</span>
+    <div class="badge">Slide 04</div>
+    <h2>Gastos en publicidad</h2>
+    <div class="desc">
+      Desglose diario de la inversión en Facebook Ads y pago a creadora de contenido durante la campaña de septiembre. Total invertido y detalle por día de actividad.
+    </div>
+    <a class="btn-link" href="publicidadupdate.html" target="_blank">
+      📈 Ver reporte de publicidad →
+    </a>
+    <div class="pista">$477.86 · 10 días activos</div>
+  </section>
+
+  <!-- ═══════ SLIDE 5 · CONTRATOS ═══════ -->
+  <section class="slide slide-content" data-slide="5">
+    <span class="icon-big">📜</span>
+    <div class="badge">Slide 05</div>
+    <h2>Contratos y cierre legal</h2>
+    <div class="desc">
+      Documentos legales del acuerdo: carta de finiquito, notificación de nulidad relativa y solicitud de conciliación. Elaborados conforme a los artículos 1.134, 1.185 y 1.331 del Código Civil Venezolano.
+    </div>
+    <button class="btn-link disabled" disabled>
+      🔒 Próximamente
+    </button>
+    <div class="pista">En preparación</div>
+  </section>
+
+</div>
+
+<!-- ═══════ NAVEGACIÓN ═══════ -->
+<div class="nav">
+  <button id="btnPrev" title="Anterior (←)">‹</button>
+  <div class="dots" id="dots"></div>
+  <button id="btnNext" title="Siguiente (→)">›</button>
+</div>
+
+<script>
+  const TOTAL = 5;
+  let actual = 1;
+
+  const slides = document.querySelectorAll('.slide');
+  const dotsContainer = document.getElementById('dots');
+  const progressFill = document.getElementById('progressFill');
+  const curNum = document.getElementById('curNum');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+
+  // Crear puntos indicadores
+  for (let i = 1; i <= TOTAL; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 1 ? ' active' : '');
+    dot.dataset.slide = i;
+    dot.onclick = () => irA(i);
+    dotsContainer.appendChild(dot);
+  }
+  const dots = document.querySelectorAll('.dot');
+
+  function irA(n) {
+    if (n < 1 || n > TOTAL) return;
+    actual = n;
+    slides.forEach(s => {
+      s.classList.toggle('active', Number(s.dataset.slide) === n);
+    });
+    dots.forEach(d => {
+      d.classList.toggle('active', Number(d.dataset.slide) === n);
+    });
+    curNum.textContent = n;
+    progressFill.style.width = (n / TOTAL * 100) + '%';
+    btnPrev.disabled = n === 1;
+    btnNext.disabled = n === TOTAL;
+  }
+
+  btnPrev.onclick = () => irA(actual - 1);
+  btnNext.onclick = () => irA(actual + 1);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') irA(actual + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'PageUp')   irA(actual - 1);
+    if (e.key === 'Home') irA(1);
+    if (e.key === 'End')  irA(TOTAL);
+  });
+
+  // Inicializar botones
+  irA(1);
+</script>
+
+</body>
+</html>
