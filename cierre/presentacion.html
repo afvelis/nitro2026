@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nitrotoon 2026 · Presentación Final</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
@@ -322,7 +323,6 @@
   const btnPrev = document.getElementById('btnPrev');
   const btnNext = document.getElementById('btnNext');
 
-  // Crear puntos indicadores
   for (let i = 1; i <= TOTAL; i++) {
     const dot = document.createElement('div');
     dot.className = 'dot' + (i === 1 ? ' active' : '');
@@ -357,8 +357,51 @@
     if (e.key === 'End')  irA(TOTAL);
   });
 
-  // Inicializar botones
   irA(1);
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CONTADOR DE ACCESOS — Registra cada visita en Supabase
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+const SUPA_URL = 'https://shnatpwnwezmbhdvshfi.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobmF0cHdud2V6bWJoZHZzaGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzgyNTgsImV4cCI6MjEwNTUxNDI1OH0.2fwqzX6zdr3m0qWCD_brKtdFVeWfcs4FsmAvSBLibN4';
+
+(async function registrarAcceso() {
+  try {
+    // 1. Obtener IP y geolocalización aproximada
+    let geo = {};
+    try {
+      const r = await fetch('https://ipwho.is/');
+      geo = await r.json();
+    } catch (e) {
+      console.log('Sin geolocalización:', e);
+    }
+
+    // 2. Guardar en Supabase
+    const { createClient } = supabase;
+    const db = createClient(SUPA_URL, SUPA_KEY);
+
+    // IP aproximada (solo los 3 primeros octetos, ej: 190.123.45.0)
+    let ipAprox = null;
+    if (geo.ip) {
+      ipAprox = geo.ip.split('.').slice(0, 3).join('.') + '.0';
+    }
+
+    await db.from('accesos_presentacion').insert({
+      ip_publica: geo.ip || null,
+      ip_aproximada: ipAprox,
+      pais: geo.country || null,
+      ciudad: geo.city || null,
+      user_agent: navigator.userAgent,
+      es_movil: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent),
+      referrer: document.referrer || 'directo',
+      pagina: window.location.pathname
+    });
+  } catch (e) {
+    console.log('Error registrando acceso:', e);
+  }
+})();
 </script>
 
 </body>
