@@ -654,5 +654,42 @@ function toggle(id) {
   d.style.display = d.style.display === "block" ? "none" : "block";
 }
 </script>
+ <!-- ═══ CONTADOR DE ACCESOS ═══ -->
+<script>
+(async function registrarAcceso() {
+  try {
+    let geo = {};
+    try {
+      const r = await fetch('https://ipwho.is/');
+      geo = await r.json();
+    } catch (e) { console.log('Sin geo:', e); }
+
+    let ipAprox = null;
+    if (geo.ip) {
+      ipAprox = geo.ip.split('.').slice(0, 3).join('.') + '.0';
+    }
+
+    await fetch(URL + "/rest/v1/accesos_presentacion", {
+      method: 'POST',
+      headers: {
+        'apikey': KEY,
+        'Authorization': 'Bearer ' + KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        ip_publica: geo.ip || null,
+        ip_aproximada: ipAprox,
+        pais: geo.country || null,
+        ciudad: geo.city || null,
+        user_agent: navigator.userAgent,
+        es_movil: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent),
+        referrer: document.referrer || 'directo',
+        pagina: window.location.pathname
+      })
+    });
+  } catch (e) { console.log('Error registrando acceso:', e); }
+})();
+</script>
 </body>
 </html>
