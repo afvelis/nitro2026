@@ -268,7 +268,7 @@
     </table>
   </div>
 
-  <div class="banco-bloque">
+    <div class="banco-bloque">
     <div class="banco-titulo">Cuadre de brazaletes</div>
     <table>
       <thead><tr><th>Brazalete</th><th>Día</th><th>Representaba</th><th class="num">Cantidad</th></tr></thead>
@@ -285,10 +285,41 @@
       <tbody>
         <tr><td>Vendidas dentro del convenio (post-03/06/2026)</td><td class="num">663</td></tr>
         <tr><td>Vendidas antes del convenio (2025, evento reprogramado)</td><td class="num">219</td></tr>
-        <tr><td>Cortesía (talentos, negocios, convenios, premios)</td><td class="num">pendiente</td></tr>
+        <tr><td>Cortesía (talentos, negocios, convenios, premios)</td><td class="num">570</td></tr>
         <tr><td><b>Total</b></td><td class="num"><b>882</b></td></tr>
       </tbody>
     </table>
+    <button class="btn" onclick="toggle('cortesias_detalle')">📋 Ver detalle de cortesías</button>
+    <div id="cortesias_detalle" class="detalle">
+      <p style="font-size:11px; color:#666; margin:10px 0;">
+        De las 1.000 cortesías presupuestadas, 102 fueron prestadas a venta y 570 ingresaron como cortesía neta al evento.
+      </p>
+      <div class="kpis">
+        <div class="kpi"><div class="label">Presupuestadas</div><div class="valor">1.000</div></div>
+        <div class="kpi"><div class="label">Prestadas a venta</div><div class="valor">102</div></div>
+        <div class="kpi"><div class="label">Consumidas cortesía</div><div class="valor">570</div></div>
+        <div class="kpi"><div class="label">No distribuidas</div><div class="valor">328</div></div>
+      </div>
+      <table>
+        <thead><tr><th>Rubro</th><th class="num">Emitidas</th><th class="num">Consumidas</th><th class="num">No usadas</th></tr></thead>
+        <tbody>
+          <tr><td>Academia 1</td><td class="num">112</td><td class="num">112</td><td class="num">0</td></tr>
+          <tr><td>Academia 2</td><td class="num">48</td><td class="num">30</td><td class="num">18</td></tr>
+          <tr><td>Academia 3</td><td class="num">45</td><td class="num">25</td><td class="num">20</td></tr>
+          <tr><td>Academia 4</td><td class="num">45</td><td class="num">20</td><td class="num">25</td></tr>
+          <tr><td>Músicos (bandas)</td><td class="num">6</td><td class="num">6</td><td class="num">0</td></tr>
+          <tr><td>Expositores</td><td class="num">60</td><td class="num">60</td><td class="num">0</td></tr>
+          <tr><td>Artistas invitados</td><td class="num">15</td><td class="num">15</td><td class="num">0</td></tr>
+          <tr><td>Personal técnico</td><td class="num">25</td><td class="num">25</td><td class="num">0</td></tr>
+          <tr><td>Patrocinio</td><td class="num">140</td><td class="num">48</td><td class="num">92</td></tr>
+          <tr><td>Colegio Don Bosco</td><td class="num">150</td><td class="num">55</td><td class="num">95</td></tr>
+          <tr><td>Hermandad Gallega</td><td class="num">100</td><td class="num">38</td><td class="num">62</td></tr>
+          <tr><td>Plan Vacacional</td><td class="num">100</td><td class="num">32</td><td class="num">68</td></tr>
+          <tr><td>Dunas</td><td class="num">120</td><td class="num">104</td><td class="num">16</td></tr>
+          <tr style="font-weight:bold; border-top:2px solid #1b3a2b;"><td>TOTAL</td><td class="num">966</td><td class="num">570</td><td class="num">396</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <button class="btn" onclick="toggle('bloque_carta')" style="display:none; font-size:14px; padding:12px 20px;">📄 Cierre en acuerdo</button>
