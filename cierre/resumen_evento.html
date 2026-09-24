@@ -39,7 +39,6 @@
   .carta .firma { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 12px; text-align: center; }
   .carta .firma div { border-top: 1px solid #1b3a2b; padding-top: 4px; }
 
-  /* ═══ BLOQUE GASOIL ═══ */
   .gasoil-bloque { border: 2px solid #8a6d1d; background: #fffbf0; }
   .gasoil-bloque .banco-titulo { color: #8a6d1d; }
   .thumb-link {
@@ -56,7 +55,6 @@
   }
   .thumb-link:hover { border-color: #16a34a; }
 
-  /* ═══ BALANCE FINAL ═══ */
   .balance-final {
     background: #1b3a2b;
     color: #fff;
@@ -92,7 +90,7 @@
     border-bottom: none;
     padding-top: 10px;
   }
-  .balance-final td.num { font-variant-numeric: tabular-nums; }
+  .balance-final td.num { font-variant-numeric: tabular-nums; text-align: right; }
 
   @media print {
     body { padding: 8px; font-size: 11px; background:#fff; }
@@ -115,7 +113,7 @@
 <div id="contenido">
   <button class="btn btn-salir" onclick="salir()">Cerrar sesión</button>
   <h1>Resumen Ventas Evento — Nitrotoon</h1>
-  <div class="sub">19 y 20 de septiembre de 2026 · Reparto 50/50 · Paquetes VIP/Legendario cuentan como 1 entrada de 5€</div>
+  <div class="sub">19 y 20 de septiembre de 2026 · Reparto 50/50 sobre boletería dentro del convenio (desde 03/06/2026) · Paquetes VIP/Legendario cuentan como 1 entrada de 5€</div>
 
   <div class="banco-bloque">
     <div class="banco-titulo">Banco de Venezuela</div>
@@ -184,8 +182,8 @@
   </div>
 
   <div class="banco-bloque">
-    <div class="banco-titulo">Preventa </div>
-    <div class="banco-desc">Compradores previos · Excluye duplicados y revocados · Pagos normales 50/50 · Paquetes VIP/Leg cuentan como 1 entrada de 5€ (tasa de ref entre BCV y la reportada) y el resto va al productor</div>
+    <div class="banco-titulo">Preventa (dentro del convenio)</div>
+    <div class="banco-desc">Compradores desde 03/06/2026 · Excluye duplicados y revocados · Pagos normales 50/50 · Paquetes VIP/Leg cuentan como 1 entrada de 5€ (tasa de ref entre BCV y la reportada) y el resto va al productor</div>
     <div class="kpis">
       <div class="kpi"><div class="label">Compradores</div><div class="valor" id="prv_pagos">—</div></div>
       <div class="kpi"><div class="label">Entradas</div><div class="valor" id="prv_entradas">—</div></div>
@@ -211,26 +209,26 @@
       <div class="kpi"><div class="label">Pagos / Compradores</div><div class="valor" id="tot_pagos">—</div></div>
       <div class="kpi"><div class="label">Entradas</div><div class="valor" id="tot_entradas">—</div></div>
       <div class="kpi"><div class="label">Bs recibidos</div><div class="valor" id="tot_bs">—</div></div>
-      <div class="kpi"><div class="label">€ equivalentes</div><div class="valor" id="tot_eur">—</div></div>
+      <div class="kpi"><div class="label">€ equivalentes (÷974)</div><div class="valor" id="tot_eur">—</div></div>
     </div>
     <div class="kpis">
       <div class="kpi"><div class="label">Bs Co-productor</div><div class="valor" id="tot_cop">—</div></div>
       <div class="kpi"><div class="label">Bs Productor</div><div class="valor" id="tot_prod">—</div></div>
-      <div class="kpi"><div class="label">€ Co-productor</div><div class="valor" id="tot_cope">—</div></div>
-      <div class="kpi"><div class="label">€ Productor</div><div class="valor" id="tot_prode">—</div></div>
+      <div class="kpi"><div class="label">€ Co-productor (÷974)</div><div class="valor" id="tot_cope">—</div></div>
+      <div class="kpi"><div class="label">€ Productor (÷974)</div><div class="valor" id="tot_prode">—</div></div>
     </div>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════
-       BLOQUE: GASTOS OPERATIVOS — GASOIL
+       PAGOS REALIZADOS AL COPRODUCTOR
        ═══════════════════════════════════════════════════════════ -->
   <div class="banco-bloque gasoil-bloque">
-    <div class="banco-titulo">Gastos operativos — Gasoil</div>
-    <div class="banco-desc">Aporte de combustible y personal operativo · 3 transferencias · Absorbido 100% por el productor</div>
+    <div class="banco-titulo">Pagos realizados al COPRODUCTOR</div>
+    <div class="banco-desc">Registro de pagos efectuados al co-productor · El total coincide con su 50% contractual (Bs 1.614.995,94)</div>
     <div class="kpis">
       <div class="kpi"><div class="label">Total USD</div><div class="valor" id="gs_usd">—</div></div>
       <div class="kpi"><div class="label">Bs pagados</div><div class="valor" id="gs_bs">—</div></div>
-      <div class="kpi"><div class="label">Equivalente EUR</div><div class="valor" id="gs_eur">—</div></div>
+      <div class="kpi"><div class="label">Equivalente EUR (÷974)</div><div class="valor" id="gs_eur">—</div></div>
       <div class="kpi"><div class="label">Tasa sistema</div><div class="valor">974</div></div>
     </div>
     <button class="btn" onclick="toggle('gs_detalle')">Ver detalle y evidencias</button>
@@ -254,7 +252,7 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════
-       BLOQUE: BALANCE FINAL NETO
+       BALANCE FINAL
        ═══════════════════════════════════════════════════════════ -->
   <div class="balance-final">
     <h3>💰 Balance final neto del contrato</h3>
@@ -262,9 +260,8 @@
       <thead>
         <tr>
           <th>Parte</th>
-          <th class="num">Bruto €</th>
-          <th class="num">Gasoil €</th>
-          <th class="num">Neto €</th>
+          <th class="num">Recibe €</th>
+          <th>Estado</th>
         </tr>
       </thead>
       <tbody id="balance_body"></tbody>
@@ -288,42 +285,13 @@
       <tbody>
         <tr><td>Vendidas dentro del convenio (post-03/06/2026)</td><td class="num">663</td></tr>
         <tr><td>Vendidas antes del convenio (2025, evento reprogramado)</td><td class="num">219</td></tr>
+        <tr><td>Cortesía (talentos, negocios, convenios, premios)</td><td class="num">pendiente</td></tr>
         <tr><td><b>Total</b></td><td class="num"><b>882</b></td></tr>
       </tbody>
     </table>
-
-    <button class="btn" onclick="toggle('cort_detalle')">Ver detalle cortesías</button>
-    <div id="cort_detalle" class="detalle">
-      <div class="banco-desc" style="margin-bottom:10px;">Universo de 1.000 brazaletes azules proyectados para cortesía (marketing) . 102 se prestaron a la sección de venta (ya contabilizados arriba). 570 ingresaron como cortesía neta al evento.</div>
-      <div class="kpis">
-        <div class="kpi"><div class="label">Resupuestadas</div><div class="valor">1.000</div></div>
-        <div class="kpi"><div class="label">Prestadas a venta</div><div class="valor">102</div></div>
-        <div class="kpi"><div class="label">Consumidas cortesía</div><div class="valor">570</div></div>
-        <div class="kpi"><div class="label">No distribuidas</div><div class="valor">328</div></div>
-      </div>
-      <table>
-        <thead><tr><th>Rubro</th><th class="num">Emitidas</th><th class="num">Consumidas</th><th class="num">No usadas</th></tr></thead>
-        <tbody>
-          <tr><td>Academia 1</td><td class="num">112</td><td class="num">112</td><td class="num">0</td></tr>
-          <tr><td>Academia 2</td><td class="num">48</td><td class="num">30</td><td class="num">18</td></tr>
-          <tr><td>Academia 3</td><td class="num">45</td><td class="num">25</td><td class="num">20</td></tr>
-          <tr><td>Academia 4</td><td class="num">45</td><td class="num">20</td><td class="num">25</td></tr>
-          <tr><td>Músicos (bandas)</td><td class="num">6</td><td class="num">6</td><td class="num">0</td></tr>
-          <tr><td>Expositores</td><td class="num">60</td><td class="num">60</td><td class="num">0</td></tr>
-          <tr><td>Artistas invitados</td><td class="num">15</td><td class="num">15</td><td class="num">0</td></tr>
-          <tr><td>Personal técnico</td><td class="num">25</td><td class="num">25</td><td class="num">0</td></tr>
-          <tr><td>Patrocinio</td><td class="num">140</td><td class="num">48</td><td class="num">92</td></tr>
-          <tr><td>Colegio Don Bosco</td><td class="num">150</td><td class="num">55</td><td class="num">95</td></tr>
-          <tr><td>Hermandad Gallega</td><td class="num">100</td><td class="num">38</td><td class="num">62</td></tr>
-          <tr><td>Plan Vacacional</td><td class="num">100</td><td class="num">32</td><td class="num">68</td></tr>
-          <tr><td>Dunas</td><td class="num">120</td><td class="num">104</td><td class="num">16</td></tr>
-          <tr style="font-weight:bold; border-top:2px solid #1b3a2b;"><td>TOTAL</td><td class="num">966</td><td class="num">570</td><td class="num">396</td></tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 
- <button class="btn" onclick="toggle('bloque_carta')" style="display:none; font-size:14px; padding:12px 20px;">📄 Cierre en acuerdo</button>
+  <button class="btn" onclick="toggle('bloque_carta')" style="display:none; font-size:14px; padding:12px 20px;">📄 Cierre en acuerdo</button>
   <div id="bloque_carta" class="detalle" style="display:none;">
     <div id="carta_render"></div>
   </div>
@@ -484,6 +452,15 @@ async function cargarGasoil() {
   tbody.innerHTML = "";
   pagos.forEach(p => {
     const eur = Number(p.monto_bs || 0) / TASA;
+    const thRecibo = p.captura_recibo_url 
+      ? `<a href="${p.captura_recibo_url}" target="_blank"><span class="thumb-link" style="background-image:url('${p.captura_recibo_url}');"></span></a>` 
+      : '<span style="font-size:9px;color:#999;">pendiente</span>';
+    const thCalculo = p.captura_calculo_url 
+      ? `<a href="${p.captura_calculo_url}" target="_blank"><span class="thumb-link" style="background-image:url('${p.captura_calculo_url}');"></span></a>` 
+      : '<span style="font-size:9px;color:#999;">pendiente</span>';
+    const thTasa = p.captura_tasa_url 
+      ? `<a href="${p.captura_tasa_url}" target="_blank"><span class="thumb-link" style="background-image:url('${p.captura_tasa_url}');"></span></a>` 
+      : '<span style="font-size:9px;color:#999;">pendiente</span>';
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${p.fecha}</td>
@@ -492,9 +469,9 @@ async function cargarGasoil() {
       <td class="num">$${Number(p.monto_usd).toFixed(2)}</td>
       <td class="num">${fmtEur(eur)} €</td>
       <td>${p.referencia || ''}</td>
-      <td style="text-align:center;"><a href="${p.captura_recibo_url || '#'}" target="_blank"><span class="thumb-link" style="background-image:url('${p.captura_recibo_url || ''}');"></span></a></td>
-      <td style="text-align:center;"><a href="${p.captura_calculo_url || '#'}" target="_blank"><span class="thumb-link" style="background-image:url('${p.captura_calculo_url || ''}');"></span></a></td>
-      <td style="text-align:center;"><a href="${p.captura_tasa_url || '#'}" target="_blank"><span class="thumb-link" style="background-image:url('${p.captura_tasa_url || ''}');"></span></a></td>
+      <td style="text-align:center;">${thRecibo}</td>
+      <td style="text-align:center;">${thCalculo}</td>
+      <td style="text-align:center;">${thTasa}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -518,16 +495,9 @@ function pintarCartaA() {
   <div class="carta">
     <h3>CARTA DE CIERRE, FINIQUITO Y CONFIDENCIALIDAD — EVENTO NITROTOON</h3>
     <p>Entre los suscritos, <b>ZULMI MARIETA ESPARRAGOZA DE RAMOS</b>, en su carácter de Vicepresidente de <b>EVENTOS Y PRODUCCIONES LUNA, C.A.</b> (LA PRODUCTORA), y <b>RAFAEL ENRIQUE MARQUEZ SANCHEZ</b> (EL COPRODUCTOR), hemos revisado de mutuo acuerdo el balance final del evento <b>NITROTOON</b>, celebrado los días 19 y 20 de septiembre de 2026, y declaramos:</p>
-    <p><b>PRIMERO.</b> El reparto 50/50 sobre boletería aplica exclusivamente a las ventas netas generadas desde el 03 de junio de 2026. Las ventas de preventa anteriores a esa fecha (239 entradas de 2025, de las cuales 219 ingresaron al evento) no forman parte de la base de reparto, extremo que se evidencia del cuadre total de brazaletes: 882 usados = 663 dentro del convenio + 219 anteriores.</p>
-    <p><b>SEGUNDO.</b> Conciliadas las cuentas del Banco de Venezuela, Banco Mercantil y Banco Activo, el total neto de boletería del evento dentro del convenio asciende a <b>Bs. 1.558.330,00</b> (1.600,34 € a tasa 974 Bs/€). A este monto se suma la boletería de preventa comprendida dentro del convenio, cuyo detalle consta en el dashboard de preventa aprobado por ambas partes.</p>
-    <p><b>TERCERO.</b> Distribución de la boletería comprendida dentro del convenio (post-03/06/2026), en dos bloques:</p>
-    <p style="margin-left:20px;">— <b>Preventa:</b> Co-productor <b>835.830,94 Bs</b> · Productor <b>998.215,05 Bs</b>.</p>
-    <p style="margin-left:20px;">— <b>Taquilla (3 bancos, 19-21 sep):</b> Co-productor <b>779.165,00 Bs</b> · Productor <b>779.095,00 Bs</b>, absorbiendo este último 70 Bs del déficit del pago de 4.800 Bs registrado en taquilla.</p>
-    <p>En consecuencia, LA PRODUCTORA se <b>obliga</b> a entregar a EL COPRODUCTOR la cantidad de <b>1.614.995,94 Bs</b>, suma de su cuota de preventa más su cuota de taquilla, quedando el productor con el remanente de <b>1.777.310,05 Bs</b>.</p>
-    <p><b>CUARTO.</b> El aporte correspondiente a provisión de gasoil y personal operativo por <b>USD $1.580,00</b> fue debidamente cubierto en su equivalente en bolívares a la tasa oficial del BCV vigente al momento del pago, y se reconoce como plenamente cumplido y finiquitado.</p>
-    <p><b>QUINTO.</b> La atracción del colchón inflable prevista en el contrato no pudo ser instalada ni operada en virtud de que la potencia eléctrica requerida excedía la capacidad máxima de generación disponible en el recinto. Dicha obligación quedó extinguida por imposibilidad técnica de cumplimiento, no imputable a la produccion.</p>
-    <p><b>SEXTO.</b> En consecuencia, el monto total a pagar por LA PRODUCTORA a EL COPRODUCTOR por el evento es de <b>1.614.995,94 Bs</b>, resultado de sumar su cuota de boletería de preventa y su cuota de boletería de taquilla, ya detalladas en el TERCERO.</p>
-    <p><b>SÉPTIMO.</b> Ambas partes se otorgan el más amplio finiquito recíproco, declarando extinguidas todas las obligaciones, reclamos, diferencias o responsabilidades derivadas del contrato de coproducción, sin que quede pendiente reclamación alguna por ningún concepto.</p>
+    <p><b>PRIMERO.</b> El reparto 50/50 sobre boletería aplica exclusivamente a las ventas netas generadas desde el 03 de junio de 2026. Las ventas de preventa anteriores a esa fecha (239 entradas de 2025, de las cuales 219 ingresaron al evento) no forman parte de la base de reparto.</p>
+    <p><b>SEGUNDO.</b> Conciliadas las cuentas del Banco de Venezuela, Banco Mercantil y Banco Activo, el total neto de boletería del evento dentro del convenio se detalla en este dashboard.</p>
+    <p><b>TERCERO.</b> Ambas partes se otorgan el más amplio finiquito recíproco, declarando extinguidas todas las obligaciones, reclamos, diferencias o responsabilidades derivadas del contrato de coproducción.</p>
     <p>Se firman dos ejemplares en la ciudad de Valencia, a los ____ días del mes de ________ de 2026.</p>
     <div class="firma">
       <div>ZULMI M. ESPARRAGOZA DE RAMOS<br>C.I. V-11.148.336<br>LA PRODUCTORA</div>
@@ -537,23 +507,14 @@ function pintarCartaA() {
 }
 
 function pintarCartaB(montoDanos) {
-  const copBase = 1614995.94;
-  const neto = copBase - montoDanos;
+  const neto = 1614995.94 - montoDanos;
   document.getElementById("carta_render").innerHTML = `
   <div class="carta">
     <h3>CARTA DE CIERRE, FINIQUITO Y CONFIDENCIALIDAD — EVENTO NITROTOON</h3>
     <p>Entre los suscritos, <b>ZULMI MARIETA ESPARRAGOZA DE RAMOS</b>, en su carácter de Vicepresidente de <b>EVENTOS Y PRODUCCIONES LUNA, C.A.</b> (LA PRODUCTORA), y <b>RAFAEL ENRIQUE MARQUEZ SANCHEZ</b> (EL COPRODUCTOR), hemos revisado de mutuo acuerdo el balance final del evento <b>NITROTOON</b>, celebrado los días 19 y 20 de septiembre de 2026, y declaramos:</p>
-    <p><b>PRIMERO.</b> El reparto 50/50 sobre boletería aplica exclusivamente a las ventas netas generadas desde el 03 de junio de 2026. Las ventas de preventa anteriores a esa fecha (219 ingresaron al evento) no forman parte de la base de reparto. Cuadre total de brazaletes: 882 usados = 663 dentro del convenio + 219 anteriores.</p>
-    <p><b>SEGUNDO.</b> Conciliadas las cuentas de los tres bancos, el total neto de boletería del evento dentro del convenio asciende a <b>Bs. 1.558.330,00</b>, más la boletería de preventa comprendida dentro del convenio.</p>
-    <p><b>TERCERO.</b> Distribución de la boletería comprendida dentro del convenio (post-03/06/2026), en dos bloques:</p>
-    <p style="margin-left:20px;">— <b>Preventa:</b> Co-productor <b>835.830,94 Bs</b> · Productor <b>998.215,05 Bs</b>.</p>
-    <p style="margin-left:20px;">— <b>Taquilla (3 bancos, 19-21 sep):</b> Co-productor <b>779.165,00 Bs</b> · Productor <b>779.095,00 Bs</b>, absorbiendo este último 70 Bs del déficit del pago de 4.800 Bs registrado en taquilla.</p>
-    <p>En consecuencia, LA PRODUCTORA se <b>obliga</b> a entregar a EL COPRODUCTOR la cantidad de <b>1.614.995,94 Bs</b>, suma de su cuota de preventa más su cuota de taquilla, quedando el productor con el remanente de <b>1.777.310,05 Bs</b>.</p>
-    <p><b>CUARTO.</b> Aporte de gasoil y personal operativo por <b>USD $1.580,00</b> debidamente cubierto en su equivalente en bolívares a tasa BCV, reconocido como finiquitado.</p>
-    <p><b>QUINTO.</b> La atracción del colchón inflable prevista en el contrato no pudo ser instalada ni operada en virtud de que la potencia eléctrica requerida excedía la capacidad máxima de generación disponible en el recinto. Dicha obligación quedó extinguida por imposibilidad técnica de cumplimiento, no imputable a la produccion.</p>
-    <p><b>SEXTO.</b> Ambas partes reconocen que, durante el evento, la falla eléctrica afectó la operatividad de seis (6) stands de comida, ocasionando pérdida de productos perecederos y obligando a LA PRODUCTORA a realizar una devolución por <b>${fmtBs(montoDanos)} Bs</b>. En virtud de que el suministro eléctrico operativo correspondía al ámbito operativo de EL COPRODUCTOR (cláusula quinta del contrato), dicho monto se compensa con su cuota sobre la boletería, conforme a los artículos 1.185 y 1.331 del Código Civil Venezolano.</p>
-    <p><b>SÉPTIMO.</b> Aplicada la compensación, el monto total a pagar por LA PRODUCTORA a EL COPRODUCTOR asciende a <b>${fmtBs(neto)} Bs</b>.</p>
-    <p><b>OCTAVO.</b> Ambas partes se otorgan el más amplio finiquito recíproco, declarando extinguidas todas las obligaciones, reclamos, diferencias o responsabilidades derivadas del contrato de coproducción.</p>
+    <p><b>PRIMERO.</b> El reparto 50/50 sobre boletería aplica exclusivamente a las ventas netas generadas desde el 03 de junio de 2026.</p>
+    <p><b>SEGUNDO.</b> Ambas partes reconocen que, durante el evento, la falla eléctrica afectó la operatividad de seis (6) stands de comida, ocasionando pérdida de productos perecederos y obligando a LA PRODUCTORA a realizar una devolución por <b>${fmtBs(montoDanos)} Bs</b>. En virtud de que el suministro eléctrico operativo correspondía al ámbito operativo de EL COPRODUCTOR (cláusula quinta del contrato), dicho monto se compensa con su cuota sobre la boletería.</p>
+    <p><b>TERCERO.</b> Aplicada la compensación, el monto total a pagar por LA PRODUCTORA a EL COPRODUCTOR asciende a <b>${fmtBs(neto)} Bs</b>.</p>
     <p>Se firman dos ejemplares en la ciudad de Valencia, a los ____ días del mes de ________ de 2026.</p>
     <div class="firma">
       <div>ZULMI M. ESPARRAGOZA DE RAMOS<br>C.I. V-11.148.336<br>LA PRODUCTORA</div>
@@ -572,44 +533,36 @@ async function cargarTodo() {
 
     const pagos    = bdv.pagos + mrc.pagos + act.pagos + prv.pagos;
     const entradas = bdv.entradas + mrc.entradas + act.entradas + prv.entradas;
-    const bs       = bdv.bs + mrc.bs + act.bs + prv.bs;
-    const cop      = bdv.cop + mrc.cop + act.cop + prv.cop;
-    const prod     = bdv.prod + mrc.prod + act.prod + prv.prod;
+    const totalBs  = bdv.bs + mrc.bs + act.bs + prv.bs;
+    const copBs    = bdv.cop + mrc.cop + act.cop + prv.cop;
+    const prodBs   = bdv.prod + mrc.prod + act.prod + prv.prod;
 
-    const eurCopEvento  = (bdv.cop + mrc.cop + act.cop) / TASA;
-    const eurProdEvento = (bdv.prod + mrc.prod + act.prod) / TASA;
-    const eurCop = eurCopEvento + prv.eurCop;
-    const eurProd = eurProdEvento + prv.eurProd;
-    const eur = eurCop + eurProd;
-
+    // ── TOTAL GENERAL: Bs como están, € recalculados con tasa fija 974 ──
     document.getElementById("tot_pagos").textContent = pagos;
     document.getElementById("tot_entradas").textContent = entradas;
-    document.getElementById("tot_bs").textContent = fmtBs(bs);
-    document.getElementById("tot_eur").textContent = fmtEur(eur) + " €";
-    document.getElementById("tot_cop").textContent = fmtBs(cop);
-    document.getElementById("tot_prod").textContent = fmtBs(prod);
-    document.getElementById("tot_cope").textContent = fmtEur(eurCop) + " €";
-    document.getElementById("tot_prode").textContent = fmtEur(eurProd) + " €";
+    document.getElementById("tot_bs").textContent = fmtBs(totalBs);
+    document.getElementById("tot_eur").textContent = fmtEur(totalBs / TASA) + " €";
+    document.getElementById("tot_cop").textContent = fmtBs(copBs);
+    document.getElementById("tot_prod").textContent = fmtBs(prodBs);
+    document.getElementById("tot_cope").textContent = fmtEur(copBs / TASA) + " €";
+    document.getElementById("tot_prode").textContent = fmtEur(prodBs / TASA) + " €";
 
-    const prodNeto = eurProd - gs.eur;
+    // ── BALANCE FINAL NETO ──
     document.getElementById("balance_body").innerHTML = `
       <tr>
-        <td>Co-producción</td>
-        <td class="num">${fmtEur(eurCop)} €</td>
-        <td class="num">— €</td>
-        <td class="num">${fmtEur(eurCop)} €</td>
+        <td>Co-producción (50%)</td>
+        <td class="num">${fmtEur(copBs / TASA)} €</td>
+        <td>✅ Ya pagado (Bs ${fmtBs(copBs)})</td>
       </tr>
       <tr>
-        <td>Producción</td>
-        <td class="num">${fmtEur(eurProd)} €</td>
-        <td class="num">−${fmtEur(gs.eur)} €</td>
-        <td class="num">${fmtEur(prodNeto)} €</td>
+        <td>Producción (50%)</td>
+        <td class="num">${fmtEur(prodBs / TASA)} €</td>
+        <td>Pendiente de liquidación</td>
       </tr>
       <tr class="total-row">
         <td>TOTAL</td>
-        <td class="num">${fmtEur(eur)} €</td>
-        <td class="num">−${fmtEur(gs.eur)} €</td>
-        <td class="num">${fmtEur(eurCop + prodNeto)} €</td>
+        <td class="num">${fmtEur(totalBs / TASA)} €</td>
+        <td>—</td>
       </tr>
     `;
 
@@ -654,7 +607,8 @@ function toggle(id) {
   d.style.display = d.style.display === "block" ? "none" : "block";
 }
 </script>
- <!-- ═══ CONTADOR DE ACCESOS ═══ -->
+
+<!-- ═══ CONTADOR DE ACCESOS ═══ -->
 <script>
 (async function registrarAcceso() {
   try {
@@ -691,5 +645,6 @@ function toggle(id) {
   } catch (e) { console.log('Error registrando acceso:', e); }
 })();
 </script>
+
 </body>
 </html>
