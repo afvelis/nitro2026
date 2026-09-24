@@ -104,7 +104,7 @@
     opacity: .7;
   }
 
-  /* ═══════ SLIDES 2-5: CONTENIDO ═══════ */
+  /* ═══════ SLIDES 2-4: CONTENIDO ═══════ */
   .slide-content {
     background: #eef3f0;
   }
@@ -160,16 +160,6 @@
     background: #2a5540;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(27,58,43,.35);
-  }
-  .btn-link.disabled {
-    background: #9db0a5;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  .btn-link.disabled:hover {
-    transform: none;
-    background: #9db0a5;
-    box-shadow: none;
   }
   .pista {
     margin-top: 22px;
@@ -251,7 +241,7 @@
 
 <div class="header">
   <span class="brand">Nitrotoon 2026</span>
-  <span class="counter"><span id="curNum">1</span> / 5</span>
+  <span class="counter"><span id="curNum">1</span> / 4</span>
 </div>
 
 <div class="slides">
@@ -312,20 +302,6 @@
     <div class="pista">$477.86 · 10 días activos</div>
   </section>
 
-  <!-- ═══════ SLIDE 5 · CONTRATOS ═══════ -->
-  <section class="slide slide-content" data-slide="5">
-    <span class="icon-big">📜</span>
-    <div class="badge">Slide 05</div>
-    <h2>Contratos y cierre legal</h2>
-    <div class="desc">
-      Documentos legales del acuerdo: carta de finiquito, notificación de nulidad relativa y solicitud de conciliación. Elaborados conforme a los artículos 1.134, 1.185 y 1.331 del Código Civil Venezolano.
-    </div>
-    <a class="btn-link" href="contratos.html" target="_blank">
-  📜 Ver contratos →
-</a>
-<div class="pista">Se abre en una pestaña nueva</div>
-  </section>
-
 </div>
 
 <!-- ═══════ NAVEGACIÓN ═══════ -->
@@ -336,7 +312,7 @@
 </div>
 
 <script>
-  const TOTAL = 5;
+  const TOTAL = 4;
   let actual = 1;
 
   const slides = document.querySelectorAll('.slide');
