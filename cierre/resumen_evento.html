@@ -551,17 +551,22 @@ async function cargarTodo() {
     document.getElementById("balance_body").innerHTML = `
       <tr>
         <td>Co-producción (50%)</td>
-        <td class="num">${fmtEur(copBs / TASA)} €</td>
-        <td>✅ Ya pagado (Bs ${fmtBs(copBs)})</td>
+        <td class="num">Bs ${fmtBs(copBs)}</td>
+        <td>✅ Ya pagado</td>
       </tr>
       <tr>
         <td>Producción (50%)</td>
-        <td class="num">${fmtEur(prodBs / TASA)} €</td>
+        <td class="num">Bs ${fmtBs(copBs)}</td>
         <td>Pendiente de liquidación</td>
+      </tr>
+      <tr style="background:rgba(255,255,255,.06);">
+        <td style="font-style:italic;">+ Paquetes premium</td>
+        <td class="num">Bs ${fmtBs(prodBs - copBs)}</td>
+        <td>100% al productor</td>
       </tr>
       <tr class="total-row">
         <td>TOTAL</td>
-        <td class="num">${fmtEur(totalBs / TASA)} €</td>
+        <td class="num">Bs ${fmtBs(totalBs)}</td>
         <td>—</td>
       </tr>
     `;
