@@ -558,6 +558,47 @@ async function exportarContactos() {
     alert("Error al exportar contactos: " + e);
   }
 }
+ // ══════════════════════════════════════════════════════════════
+// Exportar contactos (CSV)
+// ══════════════════════════════════════════════════════════════
+async function exportarContactos() {
+  try {
+    const r = await fetch(URL + "/rest/v1/preventa?select=*&order=marca_temporal.asc",
+      { headers: { apikey: KEY, Authorization: "Bearer " + KEY } });
+    const rows = await r.json();
+    const validos = rows.filter(x => x.flag_revisar !== "duplicado" && x.flag_revisar !== "revocado");
+
+    const cabecera = ["Nombre", "Cédula", "Teléfono", "Email formulario", "Email confirmado", "Fecha"];
+    const lineas = [cabecera.join(";")];
+
+    validos.forEach(x => {
+      const campos = [
+        x.nombre || "",
+        x.cedula || "",
+        x.telefono || "",
+        x.email_formulario || "",
+        x.email_confirmado || "",
+        (x.marca_temporal || "").substring(0, 10)
+      ].map(c => '"' + String(c).replace(/"/g, '""') + '"');
+      lineas.push(campos.join(";"));
+    });
+
+    const csv = "\uFEFF" + lineas.join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "contactos_preventa_" + new Date().toISOString().substring(0, 10) + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    alert("Error al exportar contactos: " + e);
+  }
+}
+// ══════════════════════════════════════════════════════════════
+
 // ══════════════════════════════════════════════════════════════
 
 function pintarCartaA() {
