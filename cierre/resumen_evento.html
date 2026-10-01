@@ -28,6 +28,8 @@
   .btn:hover { background: #2a5540; }
   .btn-salir { background: #8a1d1d; float: right; }
   .btn-salir:hover { background: #a82828; }
+  .btn-export { background: #2563eb; }
+  .btn-export:hover { background: #1e40af; }
   .detalle { display: none; margin-top: 8px; }
   .nota { font-size: 10px; color: #8a6d1d; }
   .banco-bloque { border: 1px solid #cfd8d2; border-radius: 6px; padding: 14px; margin-bottom: 20px; background:#fff; }
@@ -114,6 +116,8 @@
   <button class="btn btn-salir" onclick="salir()">Cerrar sesión</button>
   <h1>Resumen Ventas Evento — Nitrotoon</h1>
   <div class="sub">19 y 20 de septiembre de 2026 · Reparto 50/50 sobre boletería dentro del convenio (desde 03/06/2026) · Paquetes VIP/Legendario cuentan como 1 entrada de 5€</div>
+
+  <button class="btn btn-export" onclick="exportarContactos()">📥 Exportar contactos (CSV)</button>
 
   <div class="banco-bloque">
     <div class="banco-titulo">Banco de Venezuela</div>
@@ -219,9 +223,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       PAGOS REALIZADOS AL COPRODUCTOR
-       ═══════════════════════════════════════════════════════════ -->
   <div class="banco-bloque gasoil-bloque">
     <div class="banco-titulo">Pagos realizados al COPRODUCTOR</div>
     <div class="banco-desc">Registro de pagos efectuados al co-productor · El total coincide con su 50% contractual (Bs 1.614.995,94)</div>
@@ -251,9 +252,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       BALANCE FINAL
-       ═══════════════════════════════════════════════════════════ -->
   <div class="balance-final">
     <h3>💰 Balance final neto del contrato</h3>
     <table>
@@ -521,6 +519,47 @@ async function cargarGasoil() {
   return { bs: totBs, usd: totUsd, eur: totEur };
 }
 
+// ══════════════════════════════════════════════════════════════
+// NUEVA FUNCIÓN: exportarContactos (CSV)
+// ══════════════════════════════════════════════════════════════
+async function exportarContactos() {
+  try {
+    const r = await fetch(URL + "/rest/v1/preventa?select=*&order=marca_temporal.asc",
+      { headers: { apikey: KEY, Authorization: "Bearer " + KEY } });
+    const rows = await r.json();
+    const validos = rows.filter(x => x.flag_revisar !== "duplicado" && x.flag_revisar !== "revocado");
+
+    const cabecera = ["Nombre", "Cédula", "Teléfono", "Email formulario", "Email confirmado", "Fecha"];
+    const lineas = [cabecera.join(";")];
+
+    validos.forEach(x => {
+      const campos = [
+        x.nombre || "",
+        x.cedula || "",
+        x.telefono || "",
+        x.email_formulario || "",
+        x.email_confirmado || "",
+        (x.marca_temporal || "").substring(0, 10)
+      ].map(c => '"' + String(c).replace(/"/g, '""') + '"');
+      lineas.push(campos.join(";"));
+    });
+
+    const csv = "\uFEFF" + lineas.join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "contactos_preventa_" + new Date().toISOString().substring(0, 10) + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    alert("Error al exportar contactos: " + e);
+  }
+}
+// ══════════════════════════════════════════════════════════════
+
 function pintarCartaA() {
   document.getElementById("carta_render").innerHTML = `
   <div class="carta">
@@ -568,7 +607,6 @@ async function cargarTodo() {
     const copBs    = bdv.cop + mrc.cop + act.cop + prv.cop;
     const prodBs   = bdv.prod + mrc.prod + act.prod + prv.prod;
 
-    // ── TOTAL GENERAL: Bs como están, € recalculados con tasa fija 974 ──
     document.getElementById("tot_pagos").textContent = pagos;
     document.getElementById("tot_entradas").textContent = entradas;
     document.getElementById("tot_bs").textContent = fmtBs(totalBs);
@@ -578,7 +616,6 @@ async function cargarTodo() {
     document.getElementById("tot_cope").textContent = fmtEur(copBs / TASA) + " €";
     document.getElementById("tot_prode").textContent = fmtEur(prodBs / TASA) + " €";
 
-    // ── BALANCE FINAL NETO ──
     document.getElementById("balance_body").innerHTML = `
       <tr>
         <td>Co-producción (50%)</td>
