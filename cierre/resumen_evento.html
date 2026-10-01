@@ -30,6 +30,31 @@
   .btn-salir:hover { background: #a82828; }
   .btn-export { background: #2563eb; }
   .btn-export:hover { background: #1e40af; }
+ .contactos-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(27,58,43,.75);
+  z-index: 999;
+  padding: 30px;
+  overflow-y: auto;
+}
+.contactos-overlay.activo { display: block; }
+.contactos-panel {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.contactos-panel h2 { font-size: 18px; margin: 0 0 6px 0; border: none; padding: 0; }
+.contactos-panel .cont-sub { font-size: 12px; color: #666; margin-bottom: 16px; }
+.contactos-panel .cont-botones { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.contactos-panel .cont-botones .btn-salir { float: none; }
+.contactos-tabla-wrap { max-height: 62vh; overflow-y: auto; border: 1px solid #cfd8d2; border-radius: 4px; }
+.contactos-panel table { margin-bottom: 0; }
+.contactos-panel thead th { position: sticky; top: 0; background: #eef3f0; z-index: 1; }
   .detalle { display: none; margin-top: 8px; }
   .nota { font-size: 10px; color: #8a6d1d; }
   .banco-bloque { border: 1px solid #cfd8d2; border-radius: 6px; padding: 14px; margin-bottom: 20px; background:#fff; }
@@ -114,10 +139,36 @@
 
 <div id="contenido">
   <button class="btn btn-salir" onclick="salir()">Cerrar sesión</button>
+ <!-- ═══ PANEL DE CONTACTOS ═══ -->
+<div id="contactos_overlay" class="contactos-overlay">
+  <div class="contactos-panel">
+    <h2>Contactos registrados — Preventa Nitrotoon</h2>
+    <div class="cont-sub" id="contactos_resumen">Cargando...</div>
+    <div class="cont-botones">
+      <button class="btn" onclick="imprimirContactos()">🖨️ Imprimir</button>
+      <button class="btn btn-export" onclick="descargarCSV()">📥 Descargar CSV</button>
+      <button class="btn btn-salir" onclick="cerrarContactos()">✖ Cerrar</button>
+    </div>
+    <div class="contactos-tabla-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>Cédula</th>
+          <th>Teléfono</th>
+          <th>Email formulario</th>
+          <th>Email confirmado</th>
+          <th>Fecha</th>
+        </tr></thead>
+        <tbody id="contactos_tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
   <h1>Resumen Ventas Evento — Nitrotoon</h1>
   <div class="sub">19 y 20 de septiembre de 2026 · Reparto 50/50 sobre boletería dentro del convenio (desde 03/06/2026) · Paquetes VIP/Legendario cuentan como 1 entrada de 5€</div>
 
-  <button class="btn btn-export" onclick="exportarContactos()">📥 Exportar contactos (CSV)</button>
+  <button class="btn btn-export" onclick="verContactos()">👥 Ver contactos registrados</button>
 
   <div class="banco-bloque">
     <div class="banco-titulo">Banco de Venezuela</div>
@@ -520,45 +571,119 @@ async function cargarGasoil() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// NUEVA FUNCIÓN: exportarContactos (CSV)
+// CONTACTOS — Ver en tabla, imprimir y descargar CSV
 // ══════════════════════════════════════════════════════════════
-async function exportarContactos() {
+let contactosCache = [];
+
+async function verContactos() {
+  const overlay = document.getElementById("contactos_overlay");
+  const tbody = document.getElementById("contactos_tbody");
+  const resumen = document.getElementById("contactos_resumen");
+  overlay.classList.add("activo");
+  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:#666;">Cargando contactos...</td></tr>`;
+  resumen.textContent = "Cargando...";
+
   try {
     const r = await fetch(URL + "/rest/v1/preventa?select=*&order=marca_temporal.asc",
       { headers: { apikey: KEY, Authorization: "Bearer " + KEY } });
     const rows = await r.json();
-    const validos = rows.filter(x => x.flag_revisar !== "duplicado" && x.flag_revisar !== "revocado");
+    contactosCache = rows.filter(x => x.flag_revisar !== "duplicado" && x.flag_revisar !== "revocado");
 
-    const cabecera = ["Nombre", "Cédula", "Teléfono", "Email formulario", "Email confirmado", "Fecha"];
-    const lineas = [cabecera.join(";")];
-
-    validos.forEach(x => {
-      const campos = [
-        x.nombre || "",
-        x.cedula || "",
-        x.telefono || "",
-        x.email_formulario || "",
-        x.email_confirmado || "",
-        (x.marca_temporal || "").substring(0, 10)
-      ].map(c => '"' + String(c).replace(/"/g, '""') + '"');
-      lineas.push(campos.join(";"));
+    resumen.textContent = "Total: " + contactosCache.length + " contactos registrados (sin duplicados ni revocados).";
+    tbody.innerHTML = "";
+    contactosCache.forEach((x, i) => {
+      const tr = document.createElement("tr");
+      const fecha = (x.marca_temporal || "").substring(0, 10);
+      tr.innerHTML = `
+        <td class="num">${i + 1}</td>
+        <td>${x.nombre || ""}</td>
+        <td>${x.cedula || ""}</td>
+        <td>${x.telefono || ""}</td>
+        <td>${x.email_formulario || ""}</td>
+        <td>${x.email_confirmado || ""}</td>
+        <td>${fecha}</td>
+      `;
+      tbody.appendChild(tr);
     });
-
-    const csv = "\uFEFF" + lineas.join("\r\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "contactos_preventa_" + new Date().toISOString().substring(0, 10) + ".csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-   window.URL.revokeObjectURL(url);
   } catch (e) {
-    alert("Error al exportar contactos: " + e);
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:#8a1d1d;">Error al cargar: ${e}</td></tr>`;
+    resumen.textContent = "Error.";
   }
 }
 
+function cerrarContactos() {
+  document.getElementById("contactos_overlay").classList.remove("activo");
+}
+
+function imprimirContactos() {
+  if (contactosCache.length === 0) { alert("Primero abre la lista de contactos."); return; }
+  const w = window.open("", "", "width=900,height=700");
+  let filas = "";
+  contactosCache.forEach((x, i) => {
+    const fecha = (x.marca_temporal || "").substring(0, 10);
+    filas += `<tr>
+      <td class="num">${i + 1}</td>
+      <td>${x.nombre || ""}</td>
+      <td>${x.cedula || ""}</td>
+      <td>${x.telefono || ""}</td>
+      <td>${x.email_formulario || ""}</td>
+      <td>${x.email_confirmado || ""}</td>
+      <td>${fecha}</td>
+    </tr>`;
+  });
+  w.document.write(`
+    <html><head><title>Contactos Preventa Nitrotoon</title>
+    <style>
+      body { font-family: Georgia, serif; padding: 18px; color: #1b3a2b; }
+      h1 { font-size: 16px; margin: 0 0 4px 0; }
+      p { font-size: 11px; color: #666; margin: 0 0 12px 0; }
+      table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+      th, td { border: 1px solid #999; padding: 4px 6px; text-align: left; }
+      th { background: #eef3f0; }
+      td.num { text-align: center; width: 28px; }
+    </style></head><body>
+    <h1>Contactos registrados — Preventa Nitrotoon</h1>
+    <p>Total: ${contactosCache.length} contactos · Sin duplicados ni revocados</p>
+    <table>
+      <thead><tr>
+        <th>#</th><th>Nombre</th><th>Cédula</th><th>Teléfono</th>
+        <th>Email formulario</th><th>Email confirmado</th><th>Fecha</th>
+      </tr></thead>
+      <tbody>${filas}</tbody>
+    </table>
+    </body></html>
+  `);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
+}
+
+function descargarCSV() {
+  if (contactosCache.length === 0) { alert("Primero abre la lista de contactos."); return; }
+  const cabecera = ["Nombre", "Cédula", "Teléfono", "Email formulario", "Email confirmado", "Fecha"];
+  const lineas = [cabecera.join(";")];
+  contactosCache.forEach(x => {
+    const campos = [
+      x.nombre || "",
+      x.cedula || "",
+      x.telefono || "",
+      x.email_formulario || "",
+      x.email_confirmado || "",
+      (x.marca_temporal || "").substring(0, 10)
+    ].map(c => '"' + String(c).replace(/"/g, '""') + '"');
+    lineas.push(campos.join(";"));
+  });
+  const csv = "\uFEFF" + lineas.join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "contactos_preventa_" + new Date().toISOString().substring(0, 10) + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+}
 // ══════════════════════════════════════════════════════════════
 
 function pintarCartaA() {
