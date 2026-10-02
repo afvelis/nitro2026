@@ -1,0 +1,26 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: TEST - Insertar acceso keep-alive
+        run: |
+          curl -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/accesos_presentacion" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            -d '{
+              "user_agent": "__keepalive__",
+              "referrer": "github-actions",
+              "pagina": "/keepalive",
+              "es_movil": false
+            }' \
+            --fail --silent --show-error
+          echo "✅ Fila TEST insertada"
