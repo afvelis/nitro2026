@@ -2,6 +2,7 @@ name: Keep Supabase Alive
 
 on:
   schedule:
+    # Se ejecuta todos los días; el propio workflow añade un delay aleatorio.
     - cron: '17 9 * * *'
   workflow_dispatch:
 
@@ -9,7 +10,25 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: TEST - Insertar acceso keep-alive
+      - name: Espera aleatoria (0 a 180 minutos)
+        run: |
+          DELAY=$((RANDOM % 181))
+          echo "Esperando $DELAY minutos antes del ping..."
+          sleep $((DELAY * 60))
+
+      - name: Dado del 1 al 100 (inserta solo si sale <= 70)
+        id: dado
+        run: |
+          DADO=$((RANDOM % 100 + 1))
+          echo "Dado: $DADO"
+          if [ "$DADO" -le 70 ]; then
+            echo "insertar=si" >> $GITHUB_OUTPUT
+          else
+            echo "insertar=no" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Insertar acceso keep-alive
+        if: steps.dado.outputs.insertar == 'si'
         run: |
           curl -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/accesos_presentacion" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
@@ -23,4 +42,8 @@ jobs:
               "es_movil": false
             }' \
             --fail --silent --show-error
-          echo "✅ Fila TEST insertada"
+          echo "✅ Fila keep-alive insertada"
+
+      - name: Skip (no tocó insertar hoy)
+        if: steps.dado.outputs.insertar == 'no'
+        run: echo "⏭️ Hoy no se inserta (dado > 70). Otra vez será."
